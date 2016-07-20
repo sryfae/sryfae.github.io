@@ -1,0 +1,358 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>canvas绘制矩形 | sry blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="sry">
+    
+    <meta name="description" content="H5学习之canvas——绘制矩形用canvas绘制图形需要经过几道步骤：
+
+取得canvas元素
+ 首先，用document.getElementById等方法取得canvas对象。因为需要调用这个对象提供的方法来进行图形绘制。
+
+取得上下文（context）
+ 进行图形绘制时，需要用到图形上下文">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="sry blog" title="sry blog"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="sry blog">sry blog</a></h1>
+				<h2 class="blog-motto">前端小白的学习之路</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归类</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:sryria.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/07/20/canvas绘制矩形/" title="canvas绘制矩形" itemprop="url">canvas绘制矩形</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://sryria.com" title="sry">sry</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2016-07-20T08:18:38.000Z" itemprop="datePublished">2016-07-20</time>
+    更新日期:<time datetime="2016-07-20T09:41:42.996Z" itemprop="dateModified">2016-07-20</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#H5学习之canvas——绘制矩形"><span class="toc-number">1.</span> <span class="toc-text">H5学习之canvas——绘制矩形</span></a></li></ol>
+		</div>
+		
+		<h1 id="H5学习之canvas——绘制矩形"><a href="#H5学习之canvas——绘制矩形" class="headerlink" title="H5学习之canvas——绘制矩形"></a>H5学习之canvas——绘制矩形</h1><p>用canvas绘制图形需要经过几道步骤：</p>
+<ol>
+<li><p>取得canvas元素</p>
+<p> 首先，用document.getElementById等方法取得canvas对象。因为需要调用这个对象提供的方法来进行图形绘制。</p>
+</li>
+<li><p>取得上下文（context）</p>
+<p> 进行图形绘制时，需要用到图形上下文(graphics context)，图形上下文中是一个封装了很多绘图功能的对象。需要使用canvas对象的getContext方法来获得图形上下文。在draw函数中，将参数设为“2d”。<strong>ps：不能设置为3d或4d</strong></p>
+</li>
+<li><p>填充与绘制边框</p>
+<p> 用canvas元素绘制图形的时候，有两种方式——填充(fill)与绘制边框(stroke)。填充是指填满图形内部；绘制边框是指不填满图形内部，只绘制图形外框。canvas元素结合使用这两种方式来绘制图形。</p>
+</li>
+<li><p>设定绘图样式（style）</p>
+<ul>
+<li><p>设定填充图形的样式</p>
+<p>  fillStyle属性——填充的样式，在该属性中填入填充的颜色值</p>
+</li>
+<li><p>设定图形边框的样式</p>
+<p>  strokeStyle属性——图形边框的样式。在该属性填入边框的的颜色值</p>
+</li>
+</ul>
+</li>
+<li><p>指定线宽</p>
+<p> 使用图形上下文对象的lineWidth属性设置图形边框的高度。在绘制图形的时候，任何直线都可以通过lineWidth属性来指定直线的宽度。</p>
+</li>
+<li><p>指定颜色值</p>
+</li>
+<li><p>绘制矩形</p>
+<p> context.fillRect(x,y,width,height)</p>
+<p> context.strokeRect(x,y,width,height)</p>
+<p> 这里的context指的是图形上下文对象，这两个方法使用同样的参数，x是指矩形起点的横坐标，y指矩形起点的纵坐标，坐标原点为canvas画布的最左上角，width是指矩形的长度，height是指矩形的高度——通过这四个参数，矩形的大小同时就被确实。</p>
+</li>
+</ol>
+<p>下面为例子代码清单：</p>
+<p>rectangle.html:</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">   	<span class="tag">&lt;<span class="name">title</span>&gt;</span>canvas元素示例<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">   	<span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span> <span class="attr">src</span>=<span class="string">"js/rectangle.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span> <span class="attr">onload</span>=<span class="string">"draw('canvas')"</span>&gt;</span></span><br><span class="line">	</span><br><span class="line">	<span class="tag">&lt;<span class="name">canvas</span> <span class="attr">id</span>=<span class="string">"canvas"</span> <span class="attr">width</span>=<span class="string">"400"</span> <span class="attr">height</span>=<span class="string">"300"</span>&gt;</span><span class="tag">&lt;/<span class="name">canvas</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>rectangle.js</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">draw</span>(<span class="params">id</span>)</span>&#123;</span><br><span class="line">    <span class="keyword">var</span> canvas = <span class="built_in">document</span>.getElementById(id);</span><br><span class="line">    <span class="keyword">if</span>(canvas == <span class="literal">null</span>) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">var</span> context = canvas.getContext(<span class="string">'2d'</span>);<span class="comment">//获取图形上下文，ps:只能是2d</span></span><br><span class="line">    context.fillStyle = <span class="string">"#eef"</span>;</span><br><span class="line">    context.fillRect(<span class="number">0</span>,<span class="number">0</span>,<span class="number">400</span>,<span class="number">300</span>);</span><br><span class="line">    context.fillStyle = <span class="string">"red"</span>;<span class="comment">//填充的样式，该属性填入填充的颜色</span></span><br><span class="line">    context.strokeStyle = <span class="string">"blue"</span>;</span><br><span class="line">    context.lineWidth = <span class="number">1</span>;</span><br><span class="line">    context.fillRect(<span class="number">50</span>,<span class="number">50</span>,<span class="number">100</span>,<span class="number">100</span>);</span><br><span class="line">    context.strokeRect(<span class="number">50</span>,<span class="number">50</span>,<span class="number">100</span>,<span class="number">100</span>);</span><br><span class="line">    <span class="comment">//fileRect(x,y,width,height),x指矩形起点横坐标，y指矩形起点纵坐标</span></span><br><span class="line">    <span class="comment">//坐标原点是canvas画布的左上角，width指矩形长度，height指矩形高度</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/HTML5/">HTML5</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://sryria.com/2016/07/20/canvas绘制矩形/" data-title="canvas绘制矩形 | sry blog" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2016/06/22/WebSocket-1/"  title="WebSocket">
+ <strong>NEXT:</strong><br/> 
+ <span>WebSocket
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#H5学习之canvas——绘制矩形"><span class="toc-number">1.</span> <span class="toc-text">H5学习之canvas——绘制矩形</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/HTML5/" title="HTML5">HTML5<sup>1</sup></a></li>
+		
+			<li><a href="/tags/网络/" title="网络">网络<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2016 
+		
+		<a href="http://sryria.com" target="_blank" title="sry">sry</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+  </body>
+</html>
