@@ -4,12 +4,19 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>Hello World | sry blog</title>
+    <title>canvas绘制圆形 | sry blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
     
     <meta name="author" content="sry">
     
-    <meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in ">
+    <meta name="description" content="H5学习之canvas——绘制圆形用canvas绘制圆形需要经过几道步骤：
+
+开始创建路径
+  首先，使用图形上下文对象的beginPath方法，该方法的的定义如下所示：
+
+context.beginPath();
+
+  该方法不使用参数。通过调用该方法，开始路径的创建。在几次循环地创建路径的过程中">
     
     
     
@@ -65,15 +72,15 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2016/04/28/hello-world/" title="Hello World" itemprop="url">Hello World</a>
+      <a href="/2016/07/20/canvas绘制圆形/" title="canvas绘制圆形" itemprop="url">canvas绘制圆形</a>
   </h1>
   <p class="article-author">By
     
       <a href="http://sryria.com" title="sry">sry</a>
     </p>
   <p class="article-time">
-    <time datetime="2016-04-28T02:03:35.624Z" itemprop="datePublished">2016-04-28</time>
-    更新日期:<time datetime="2016-04-28T02:03:35.624Z" itemprop="dateModified">2016-04-28</time>
+    <time datetime="2016-07-20T09:45:20.000Z" itemprop="datePublished">2016-07-20</time>
+    更新日期:<time datetime="2016-07-21T01:39:37.455Z" itemprop="dateModified">2016-07-21</time>
     
   </p>
 </header>
@@ -82,28 +89,78 @@
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
-		<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Quick-Start"><span class="toc-number">1.</span> <span class="toc-text">Quick Start</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Create-a-new-post"><span class="toc-number">1.1.</span> <span class="toc-text">Create a new post</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Run-server"><span class="toc-number">1.2.</span> <span class="toc-text">Run server</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Generate-static-files"><span class="toc-number">1.3.</span> <span class="toc-text">Generate static files</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Deploy-to-remote-sites"><span class="toc-number">1.4.</span> <span class="toc-text">Deploy to remote sites</span></a></li></ol></li></ol>
+		<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#H5学习之canvas——绘制圆形"><span class="toc-number">1.</span> <span class="toc-text">H5学习之canvas——绘制圆形</span></a></li></ol>
 		</div>
 		
-		<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
+		<h1 id="H5学习之canvas——绘制圆形"><a href="#H5学习之canvas——绘制圆形" class="headerlink" title="H5学习之canvas——绘制圆形"></a>H5学习之canvas——绘制圆形</h1><p>用canvas绘制圆形需要经过几道步骤：</p>
+<ul>
+<li><p>开始创建路径</p>
+<p>  首先，使用图形上下文对象的beginPath方法，该方法的的定义如下所示：</p>
+<blockquote>
+<p>context.beginPath();</p>
+</blockquote>
+<p>  该方法不使用参数。通过调用该方法，开始路径的创建。在几次循环地创建路径的过程中，每次开始都要调用beginPath函数。</p>
+</li>
+<li><p>创建圆形路径</p>
+<p>  创建圆形路径是，需要使用图形上下文对象的arc方法。该方法的定义如下所示。</p>
+<blockquote>
+<p>context.arc(x,y,radius,startAngle,endAngle,anticlockwise)</p>
+</blockquote>
+<p>  该方法使用六个参数，x为绘制圆形的起点横坐标，y为绘制圆形的起点纵坐标，radius为圆形半径，startAngle为开始角度，endAngle为结束角度。anticlockwise为是否按顺时针方向进行绘制。在Canvas API中，绘制半径与弧时指定的参数为开始弧度与结束弧度，如果你喜欢使用<br>  角度，请使用如下所示的方法将角度转换为弧度。</p>
+<blockquote>
+<p>var radians = degree*math.PI/180</p>
+</blockquote>
+<p>  其中Math.PI表示角度为180度，Math.PI*2表示角度为360度。</p>
+</li>
+<li><p>关闭路径</p>
+<p>  路径创建完成之后，使用图形上下文对象的closePath方法将路径关闭。该方法定义如下所示。</p>
+<blockquote>
+<p>context.closePath();</p>
+</blockquote>
+<p>  将路径关闭后，路径的创建工作就完成了，但是请注意，这是只是路径创建完毕而已，还没有真正绘制任何图形。</p>
+</li>
+<li><p>设定绘制样式，进行图形绘制。</p>
+<blockquote>
+<p>context.fillStyle = ‘rgba(255,0,0,0.25)’;</p>
+<p>context.fill();</p>
+</blockquote>
+<p>  与绘制矩形方法一样。</p>
+</li>
+</ul>
+<p>绘制图形代码清单</p>
+<hr>
+<p>···Javascript</p>
+<pre><code>function draw(id){
+    var canvas = document.getElementById(id);
+    if(canvas == null) return false;
+    var context = canvas.getContext(&apos;2d&apos;);
+    context.fillStyle = &apos;#eef&apos;;
+    context.fillRect(0,0,400,300);
+    var n = 0;
+    for(var i=0;i&lt;10;i++){
+        context.beginPath();//开始创建路径
+        context.arc(i*25,i*25,i*10,0,Math.PI*2,true);
+        context.closePath();
+        context.fillStyle = &quot;rgba(255, 0, 0, 0.35)&quot;;
+        context.fill();
+    }
+}
+</code></pre><p>···</p>
   
 	</div>
 		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/HTML5/">HTML5</a>
+  </div>
 
 
 
 
 <div class="article-share" id="share">
 
-  <div data-url="http://sryria.com/2016/04/28/hello-world/" data-title="Hello World | sry blog" data-tsina="null" class="share clearfix">
+  <div data-url="http://sryria.com/2016/07/20/canvas绘制圆形/" data-title="canvas绘制圆形 | sry blog" data-tsina="null" class="share clearfix">
   </div>
 
 </div>
@@ -112,14 +169,14 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2016/06/22/WebSocket-1/" title="WebSocket">
-  <strong>PREVIOUS:</strong><br/>
-  <span>
-  WebSocket</span>
+
+<div class="next">
+<a href="/2016/07/20/canvas绘制矩形/"  title="canvas绘制矩形">
+ <strong>NEXT:</strong><br/> 
+ <span>canvas绘制矩形
+</span>
 </a>
 </div>
-
 
 </nav>
 
@@ -129,7 +186,7 @@
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
-  <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Quick-Start"><span class="toc-number">1.</span> <span class="toc-text">Quick Start</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Create-a-new-post"><span class="toc-number">1.1.</span> <span class="toc-text">Create a new post</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Run-server"><span class="toc-number">1.2.</span> <span class="toc-text">Run server</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Generate-static-files"><span class="toc-number">1.3.</span> <span class="toc-text">Generate static files</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Deploy-to-remote-sites"><span class="toc-number">1.4.</span> <span class="toc-text">Deploy to remote sites</span></a></li></ol></li></ol>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#H5学习之canvas——绘制圆形"><span class="toc-number">1.</span> <span class="toc-text">H5学习之canvas——绘制圆形</span></a></li></ol>
   </div>
 
 <div id="asidepart">
