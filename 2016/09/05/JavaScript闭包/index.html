@@ -1,0 +1,362 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>JavaScript闭包 | sry blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="sry">
+    
+    <meta name="description" content="JavaScript 闭包究竟是什么作者：Samaritans链接：http://www.cnblogs.com/dolphinX/archive/2012/09/29/2708763.html
+用JavaScript一年多了，闭包总是让人二丈和尚摸不着头脑。陆陆续续接触了一些闭包的知识，也犯过几次">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="sry blog" title="sry blog"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="sry blog">sry blog</a></h1>
+				<h2 class="blog-motto">前端小白的学习之路</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归类</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:sryria.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/09/05/JavaScript闭包/" title="JavaScript闭包" itemprop="url">JavaScript闭包</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://sryria.com" title="sry">sry</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2016-09-05T01:22:33.000Z" itemprop="datePublished">2016-09-05</time>
+    更新日期:<time datetime="2016-09-05T02:48:03.421Z" itemprop="dateModified">2016-09-05</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#JavaScript-闭包究竟是什么"><span class="toc-number">1.</span> <span class="toc-text">JavaScript 闭包究竟是什么</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#简单的例子"><span class="toc-number">1.1.</span> <span class="toc-text">简单的例子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#内部函数"><span class="toc-number">1.2.</span> <span class="toc-text">内部函数</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#伟大的逃脱"><span class="toc-number">1.2.1.</span> <span class="toc-text">伟大的逃脱</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#变量的作用域"><span class="toc-number">1.2.2.</span> <span class="toc-text">变量的作用域</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#闭包之间的交互"><span class="toc-number">1.3.</span> <span class="toc-text">闭包之间的交互</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#解惑"><span class="toc-number">1.4.</span> <span class="toc-text">解惑</span></a></li></ol></li></ol>
+		</div>
+		
+		<h1 id="JavaScript-闭包究竟是什么"><a href="#JavaScript-闭包究竟是什么" class="headerlink" title="JavaScript 闭包究竟是什么"></a>JavaScript 闭包究竟是什么</h1><p>作者：Samaritans<br>链接：<a href="http://www.cnblogs.com/dolphinX/archive/2012/09/29/2708763.html" target="_blank" rel="external">http://www.cnblogs.com/dolphinX/archive/2012/09/29/2708763.html</a></p>
+<p>用JavaScript一年多了，闭包总是让人二丈和尚摸不着头脑。陆陆续续接触了一些闭包的知识，也犯过几次因为不理解闭包导致的错误，一年多了资料也看了一些，但还是不是非常明白，最近偶然看了一下 jQuery基础教程 的附录，发现附录A对JavaScript的闭包的介绍简单易懂，于是借花献佛总结一下。</p>
+<h2 id="简单的例子"><a href="#简单的例子" class="headerlink" title="简单的例子"></a>简单的例子</h2><p>首先从一个经典错误谈起，页面上有若干个div， 我们想给它们绑定一个onclick方法，于是有了下面的代码</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"divTest"</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">span</span>&gt;</span>0<span class="tag">&lt;/<span class="name">span</span>&gt;</span> <span class="tag">&lt;<span class="name">span</span>&gt;</span>1<span class="tag">&lt;/<span class="name">span</span>&gt;</span> <span class="tag">&lt;<span class="name">span</span>&gt;</span>2<span class="tag">&lt;/<span class="name">span</span>&gt;</span> <span class="tag">&lt;<span class="name">span</span>&gt;</span>3<span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"divTest2"</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">span</span>&gt;</span>0<span class="tag">&lt;/<span class="name">span</span>&gt;</span> <span class="tag">&lt;<span class="name">span</span>&gt;</span>1<span class="tag">&lt;/<span class="name">span</span>&gt;</span> <span class="tag">&lt;<span class="name">span</span>&gt;</span>2<span class="tag">&lt;/<span class="name">span</span>&gt;</span> <span class="tag">&lt;<span class="name">span</span>&gt;</span>3<span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$(<span class="built_in">document</span>).ready(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">           <span class="keyword">var</span> spans = $(<span class="string">"#divTest span"</span>);</span><br><span class="line">           <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; spans.length; i++) &#123;</span><br><span class="line">               spans[i].onclick = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">                   alert(i);</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;);</span><br></pre></td></tr></table></figure>
+<p>很简单的功能可是却偏偏出错了，每次alert出的值都是4，简单的修改就好使了</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">var spans2 = $("#divTest2 span");</span><br><span class="line">       $(document).ready(function() &#123;</span><br><span class="line">           for (var i = 0; i <span class="tag">&lt; <span class="attr">spans2.length</span>; <span class="attr">i</span>++) &#123;</span><br><span class="line">               (<span class="attr">function</span>(<span class="attr">num</span>) &#123;</span><br><span class="line">                   <span class="attr">spans2</span>[<span class="attr">i</span>]<span class="attr">.onclick</span> = <span class="string">function()</span> &#123;</span><br><span class="line">                       <span class="attr">alert</span>(<span class="attr">num</span>);</span><br><span class="line">                   &#125;</span><br><span class="line">               &#125;)(<span class="attr">i</span>);</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;);</span></span><br></pre></td></tr></table></figure>
+<h2 id="内部函数"><a href="#内部函数" class="headerlink" title="内部函数"></a>内部函数</h2><p>让我们从一些基础的知识谈起,首先了解一下内部函数。内部函数就是定义在另一个函数中的函数。例如：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">outerFn</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">   	functioninnerFn () &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>innerFn就是一个被包在outerFn作用域中的内部函数。这意味着，在outerFn内部调用innerFn是有效的，而在outerFn外部调用innerFn则是无效的。下面代码会导致一个JavaScript错误：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">outerFn</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">           <span class="built_in">document</span>.write(<span class="string">"Outer function&lt;br/&gt;"</span>);</span><br><span class="line">           <span class="function"><span class="keyword">function</span> <span class="title">innerFn</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">               <span class="built_in">document</span>.write(<span class="string">"Inner function&lt;br/&gt;"</span>);</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">       innerFn();</span><br></pre></td></tr></table></figure>
+<p>不过在outerFn内部调用innerFn，则可以成功运行：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">outerFn</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">           <span class="built_in">document</span>.write(<span class="string">"Outer function&lt;br/&gt;"</span>);</span><br><span class="line">           <span class="function"><span class="keyword">function</span> <span class="title">innerFn</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">               <span class="built_in">document</span>.write(<span class="string">"Inner function&lt;br/&gt;"</span>);</span><br><span class="line">           &#125;</span><br><span class="line">           innerFn();</span><br><span class="line">       &#125;</span><br><span class="line">       outerFn();</span><br></pre></td></tr></table></figure>
+<h3 id="伟大的逃脱"><a href="#伟大的逃脱" class="headerlink" title="伟大的逃脱"></a>伟大的逃脱</h3><p>JavaScript允许开发人员像传递任何类型的数据一样传递函数，也就是说，JavaScript中的内部函数能够逃脱定义他们的外部函数。</p>
+<p>逃脱的方式有很多种，例如可以将内部函数指定给一个全局变量：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> globalVar;</span><br><span class="line">       <span class="function"><span class="keyword">function</span> <span class="title">outerFn</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">           <span class="built_in">document</span>.write(<span class="string">"Outer function&lt;br/&gt;"</span>);          </span><br><span class="line">           <span class="function"><span class="keyword">function</span> <span class="title">innerFn</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">               <span class="built_in">document</span>.write(<span class="string">"Inner function&lt;br/&gt;"</span>);</span><br><span class="line">           &#125;</span><br><span class="line">           globalVar = innerFn;</span><br><span class="line">       &#125;</span><br><span class="line">       outerFn();</span><br><span class="line">       globalVar();</span><br></pre></td></tr></table></figure>
+<p>调用outerFn时会修改全局变量globalVar，这时候它的引用变为innerFn，此后调用globalVar和调用innerFn一样。这时在outerFn外部直接调用innerFn仍然会导致错误，这是因为内部函数虽然通过把引用保存在全局变量中实现了逃脱，但这个函数的名字依然只存在于outerFn的作用域中。</p>
+<p>也可以通过在父函数的返回值来获得内部函数引用</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">outerFn</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">           <span class="built_in">document</span>.write(<span class="string">"Outer function&lt;br/&gt;"</span>);</span><br><span class="line">           <span class="function"><span class="keyword">function</span> <span class="title">innerFn</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">               <span class="built_in">document</span>.write(<span class="string">"Inner function&lt;br/&gt;"</span>);</span><br><span class="line">           &#125;</span><br><span class="line">           <span class="keyword">return</span> innerFn;</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">var</span> fnRef = outerFn();</span><br><span class="line">       fnRef();</span><br></pre></td></tr></table></figure>
+<p>这里并没有在outerFn内部修改全局变量，而是从outerFn中返回了一个对innerFn的引用。通过调用outerFn能够获得这个引用，而且这个引用可以可以保存在变量中。</p>
+<p>这种即使离开函数作用域的情况下仍然能够通过引用调用内部函数的事实，意味着<mark>只要存在调用内部函数的可能，JavaScript就需要保留被引用的函数。而且JavaScript运行时需要跟踪引用这个内部函数的所有变量，直到最后一个变量废弃，JavaScript的垃圾收集器才能释放相应的内存空间</mark>。</p>
+<p>说了半天总算和闭包有关系了，闭包是指有权限访问另一个函数作用域的变量的函数，创建闭包的常见方式就是在一个函数内部创建另一个函数，就是我们上面说的内部函数，所以刚才说的不是废话，也是闭包相关的 ^_^ </p>
+<h3 id="变量的作用域"><a href="#变量的作用域" class="headerlink" title="变量的作用域"></a>变量的作用域</h3><p>内部函数也可以有自己的变量，这些变量都被限制在内部函数的作用域中：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">outerFn</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">           <span class="built_in">document</span>.write(<span class="string">"Outer function&lt;br/&gt;"</span>);</span><br><span class="line">           <span class="function"><span class="keyword">function</span> <span class="title">innerFn</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">               <span class="keyword">var</span> innerVar = <span class="number">0</span>;</span><br><span class="line">               innerVar++;</span><br><span class="line">               <span class="built_in">document</span>.write(<span class="string">"Inner function\t"</span>);</span><br><span class="line">               <span class="built_in">document</span>.write(<span class="string">"innerVar = "</span>+innerVar+<span class="string">"&lt;br/&gt;"</span>);</span><br><span class="line">           &#125;</span><br><span class="line">           <span class="keyword">return</span> innerFn;</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">var</span> fnRef = outerFn();</span><br><span class="line">       fnRef();</span><br><span class="line">       fnRef();</span><br><span class="line">       <span class="keyword">var</span> fnRef2 = outerFn();</span><br><span class="line">       fnRef2();</span><br><span class="line">       fnRef2();</span><br></pre></td></tr></table></figure>
+<p>每当通过引用或其它方式调用这个内部函数时，就会创建一个新的innerVar变量，然后加1，最后显示</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Outer <span class="function"><span class="keyword">function</span></span><br><span class="line"><span class="title">Inner</span> <span class="title">function</span>    <span class="title">innerVar</span> = 1</span><br><span class="line"><span class="title">Inner</span> <span class="title">function</span>    <span class="title">innerVar</span> = 1</span><br><span class="line"><span class="title">Outer</span> <span class="title">function</span></span><br><span class="line"><span class="title">Inner</span> <span class="title">function</span>    <span class="title">innerVar</span> = 1</span><br><span class="line"><span class="title">Inner</span> <span class="title">function</span>    <span class="title">innerVar</span> = 1</span></span><br></pre></td></tr></table></figure>
+<p>内部函数也可以像其他函数一样引用全局变量：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> globalVar = <span class="number">0</span>;</span><br><span class="line">       <span class="function"><span class="keyword">function</span> <span class="title">outerFn</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">           <span class="built_in">document</span>.write(<span class="string">"Outer function&lt;br/&gt;"</span>);</span><br><span class="line">           <span class="function"><span class="keyword">function</span> <span class="title">innerFn</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">               globalVar++;</span><br><span class="line">               <span class="built_in">document</span>.write(<span class="string">"Inner function\t"</span>);</span><br><span class="line">               <span class="built_in">document</span>.write(<span class="string">"globalVar = "</span> + globalVar + <span class="string">"&lt;br/&gt;"</span>);</span><br><span class="line">           &#125;</span><br><span class="line">           <span class="keyword">return</span> innerFn;</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">var</span> fnRef = outerFn();</span><br><span class="line">       fnRef();</span><br><span class="line">       fnRef();</span><br><span class="line">       <span class="keyword">var</span> fnRef2 = outerFn();</span><br><span class="line">       fnRef2();</span><br><span class="line">       fnRef2();</span><br></pre></td></tr></table></figure>
+<p>现在每次调用内部函数都会持续地递增这个全局变量的值：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Outer <span class="function"><span class="keyword">function</span></span><br><span class="line"><span class="title">Inner</span> <span class="title">function</span>    <span class="title">globalVar</span> = 1</span><br><span class="line"><span class="title">Inner</span> <span class="title">function</span>    <span class="title">globalVar</span> = 2</span><br><span class="line"><span class="title">Outer</span> <span class="title">function</span></span><br><span class="line"><span class="title">Inner</span> <span class="title">function</span>    <span class="title">globalVar</span> = 3</span><br><span class="line"><span class="title">Inner</span> <span class="title">function</span>    <span class="title">globalVar</span> = 4</span></span><br></pre></td></tr></table></figure>
+<p>但是如果这个变量是父函数的局部变量又会怎样呢？因为内部函数会引用到父函数的作用域（有兴趣可以了解一下作用域链和活动对象的知识），内部函数也可以引用到这些变量</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">outerFn</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">           <span class="keyword">var</span> outerVar = <span class="number">0</span>;</span><br><span class="line">           <span class="built_in">document</span>.write(<span class="string">"Outer function&lt;br/&gt;"</span>);</span><br><span class="line">           <span class="function"><span class="keyword">function</span> <span class="title">innerFn</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">               outerVar++;</span><br><span class="line">               <span class="built_in">document</span>.write(<span class="string">"Inner function\t"</span>);</span><br><span class="line">               <span class="built_in">document</span>.write(<span class="string">"outerVar = "</span> + outerVar + <span class="string">"&lt;br/&gt;"</span>);</span><br><span class="line">           &#125;</span><br><span class="line">           <span class="keyword">return</span> innerFn;</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">var</span> fnRef = outerFn();</span><br><span class="line">       fnRef();</span><br><span class="line">       fnRef();</span><br><span class="line">       <span class="keyword">var</span> fnRef2 = outerFn();</span><br><span class="line">       fnRef2();</span><br><span class="line">       fnRef2();</span><br></pre></td></tr></table></figure>
+<p>这一次结果非常有意思，也许或出乎我们的意料</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Outer <span class="function"><span class="keyword">function</span></span><br><span class="line"><span class="title">Inner</span> <span class="title">function</span>    <span class="title">outerVar</span> = 1</span><br><span class="line"><span class="title">Inner</span> <span class="title">function</span>    <span class="title">outerVar</span> = 2</span><br><span class="line"><span class="title">Outer</span> <span class="title">function</span></span><br><span class="line"><span class="title">Inner</span> <span class="title">function</span>    <span class="title">outerVar</span> = 1</span><br><span class="line"><span class="title">Inner</span> <span class="title">function</span>    <span class="title">outerVar</span> = 2</span></span><br></pre></td></tr></table></figure>
+<p>我们看到的是前面两种情况合成的效果，通过每个引用调用innerFn都会独立的递增outerVar。也就是说第二次调用outerFn没有继续沿用outerVar的值，而是在第二次函数调用的作用域创建并绑定了一个一个新的outerVar实例，两个计数器完全无关。</p>
+<p>当内部函数在定义它的作用域的外部被引用时，就创建了该内部函数的一个闭包。这种情况下我们称既不是内部函数局部变量，也不是其参数的变量为自由变量，称外部函数的调用环境为封闭闭包的环境。从本质上讲，如果内部函数引用了位于外部函数中的变量，相当于授权该变量能够被延迟使用。因此，当外部函数调用完成后，这些变量的内存不会被释放（最后的值会保存），闭包仍然需要使用它们。</p>
+<h2 id="闭包之间的交互"><a href="#闭包之间的交互" class="headerlink" title="闭包之间的交互"></a>闭包之间的交互</h2><p>当存在多个内部函数时，很可能出现意料之外的闭包。我们定义一个递增函数，这个函数的增量为2<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">outerFn</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">           <span class="keyword">var</span> outerVar = <span class="number">0</span>;</span><br><span class="line">           <span class="built_in">document</span>.write(<span class="string">"Outer function&lt;br/&gt;"</span>);</span><br><span class="line">           <span class="function"><span class="keyword">function</span> <span class="title">innerFn1</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">               outerVar++;</span><br><span class="line">               <span class="built_in">document</span>.write(<span class="string">"Inner function 1\t"</span>);</span><br><span class="line">               <span class="built_in">document</span>.write(<span class="string">"outerVar = "</span> + outerVar + <span class="string">"&lt;br/&gt;"</span>);</span><br><span class="line">           &#125;</span><br><span class="line"></span><br><span class="line">           <span class="function"><span class="keyword">function</span> <span class="title">innerFn2</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">               outerVar += <span class="number">2</span>;</span><br><span class="line">               <span class="built_in">document</span>.write(<span class="string">"Inner function 2\t"</span>);</span><br><span class="line">               <span class="built_in">document</span>.write(<span class="string">"outerVar = "</span> + outerVar + <span class="string">"&lt;br/&gt;"</span>);</span><br><span class="line">           &#125;</span><br><span class="line">           <span class="keyword">return</span> &#123; <span class="string">"fn1"</span>: innerFn1, <span class="string">"fn2"</span>: innerFn2 &#125;;</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">var</span> fnRef = outerFn();</span><br><span class="line">       fnRef.fn1();</span><br><span class="line">       fnRef.fn2();</span><br><span class="line">       fnRef.fn1();</span><br><span class="line">       <span class="keyword">var</span> fnRef2 = outerFn();</span><br><span class="line">       fnRef2.fn1();</span><br><span class="line">       fnRef2.fn2();</span><br><span class="line">       fnRef2.fn1();</span><br></pre></td></tr></table></figure></p>
+<p>我们映射返回两个内部函数的引用，可以通过返回的引用调用任一个内部函数，结果：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Outer <span class="function"><span class="keyword">function</span></span><br><span class="line"><span class="title">Inner</span> <span class="title">function</span> 1    <span class="title">outerVar</span> = 1</span><br><span class="line"><span class="title">Inner</span> <span class="title">function</span> 2    <span class="title">outerVar</span> = 3</span><br><span class="line"><span class="title">Inner</span> <span class="title">function</span> 1    <span class="title">outerVar</span> = 4</span><br><span class="line"><span class="title">Outer</span> <span class="title">function</span></span><br><span class="line"><span class="title">Inner</span> <span class="title">function</span> 1    <span class="title">outerVar</span> = 1</span><br><span class="line"><span class="title">Inner</span> <span class="title">function</span> 2    <span class="title">outerVar</span> = 3</span><br><span class="line"><span class="title">Inner</span> <span class="title">function</span> 1    <span class="title">outerVar</span> = 4</span></span><br></pre></td></tr></table></figure>
+<p>innerFn1和innerFn2引用了同一个局部变量，因此他们共享一个封闭环境。当innerFn1为outerVar递增一时，久违innerFn2设置了outerVar的新的起点值，反之亦然。我们也看到对outerFn的后续调用还会创建这些闭包的新实例，同时也会创建新的封闭环境，本质上是创建了一个新对象，自由变量就是这个对象的实例变量，而闭包就是这个对象的实例方法，而且这些变量也是私有的，因为不能在封装它们的作用域外部直接引用这些变量，从而确保了了面向对象数据的专有性。 </p>
+<h2 id="解惑"><a href="#解惑" class="headerlink" title="解惑"></a>解惑</h2><p>现在我们可以回头看看开头写的例子就很容易明白为什么第一种写法每次都会alert 4了。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; spans.length; i++) &#123;</span><br><span class="line">   	spans[i].onclick = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">       	alert(i);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>上面代码在页面加载后就会执行，当i的值为4的时候，判断条件不成立，for循环执行完毕，但是因为每个span的onclick方法这时候为内部函数，所以i被闭包引用，内存不能被销毁，i的值会一直保持4，直到程序改变它或者所有的onclick函数销毁（主动把函数赋为null或者页面卸载）时才会被回收。这样每次我们点击span的时候，onclick函数会查找i的值（作用域链是引用方式），一查等于4，然后就alert给我们了。而第二种方式是使用了一个立即执行的函数又创建了一层闭包，函数声明放在括号内就变成了表达式，后面再加上括号括号就是调用了，这时候把i当参数传入，函数立即执行，num保存每次i的值。</p>
+<p>这一通下来想必大家也和我一样，对闭包有所了解了吧，当然完全了解的话需要把函数的执行环境和作用域链搞清楚 ^_^</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/JavaScript/">JavaScript</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://sryria.com/2016/09/05/JavaScript闭包/" data-title="JavaScript闭包 | sry blog" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2016/07/20/canvas绘制圆形/"  title="canvas绘制圆形">
+ <strong>NEXT:</strong><br/> 
+ <span>canvas绘制圆形
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#JavaScript-闭包究竟是什么"><span class="toc-number">1.</span> <span class="toc-text">JavaScript 闭包究竟是什么</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#简单的例子"><span class="toc-number">1.1.</span> <span class="toc-text">简单的例子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#内部函数"><span class="toc-number">1.2.</span> <span class="toc-text">内部函数</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#伟大的逃脱"><span class="toc-number">1.2.1.</span> <span class="toc-text">伟大的逃脱</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#变量的作用域"><span class="toc-number">1.2.2.</span> <span class="toc-text">变量的作用域</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#闭包之间的交互"><span class="toc-number">1.3.</span> <span class="toc-text">闭包之间的交互</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#解惑"><span class="toc-number">1.4.</span> <span class="toc-text">解惑</span></a></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/HTML5/" title="HTML5">HTML5<sup>2</sup></a></li>
+		
+			<li><a href="/tags/JavaScript/" title="JavaScript">JavaScript<sup>1</sup></a></li>
+		
+			<li><a href="/tags/网络/" title="网络">网络<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2016 
+		
+		<a href="http://sryria.com" target="_blank" title="sry">sry</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+  </body>
+</html>

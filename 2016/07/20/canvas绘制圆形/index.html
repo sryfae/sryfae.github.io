@@ -80,7 +80,7 @@ context.beginPath();
     </p>
   <p class="article-time">
     <time datetime="2016-07-20T09:45:20.000Z" itemprop="datePublished">2016-07-20</time>
-    更新日期:<time datetime="2016-07-21T03:01:29.245Z" itemprop="dateModified">2016-07-21</time>
+    更新日期:<time datetime="2016-08-05T06:53:52.305Z" itemprop="dateModified">2016-08-05</time>
     
   </p>
 </header>
@@ -89,7 +89,7 @@ context.beginPath();
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目录</strong>
-		<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#H5学习之canvas——绘制圆形"><span class="toc-number">1.</span> <span class="toc-text">H5学习之canvas——绘制圆形</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#如果没有关闭路径会怎样"><span class="toc-number">1.0.1.</span> <span class="toc-text">如果没有关闭路径会怎样</span></a></li></ol></li></ol></li></ol>
+		<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#H5学习之canvas——绘制圆形"><span class="toc-number">1.</span> <span class="toc-text">H5学习之canvas——绘制圆形</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#如果没有关闭路径会怎样"><span class="toc-number">1.0.1.</span> <span class="toc-text">如果没有关闭路径会怎样</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#绘制复杂图形"><span class="toc-number">2.</span> <span class="toc-text">绘制复杂图形</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#moveTo与lineTo"><span class="toc-number">2.1.</span> <span class="toc-text">moveTo与lineTo</span></a></li></ol></li></ol>
 		</div>
 		
 		<h1 id="H5学习之canvas——绘制圆形"><a href="#H5学习之canvas——绘制圆形" class="headerlink" title="H5学习之canvas——绘制圆形"></a>H5学习之canvas——绘制圆形</h1><p>用canvas绘制圆形需要经过几道步骤：</p>
@@ -139,6 +139,19 @@ context.beginPath();
 <li>同上······</li>
 </ol>
 <p>如果不关闭路径，已经创建的路径会永远保留着。就算用fill方法与stroke放到在页面上将图形已经绘制完毕，路径都不会消失。</p>
+<hr>
+<h1 id="绘制复杂图形"><a href="#绘制复杂图形" class="headerlink" title="绘制复杂图形"></a>绘制复杂图形</h1><h2 id="moveTo与lineTo"><a href="#moveTo与lineTo" class="headerlink" title="moveTo与lineTo"></a>moveTo与lineTo</h2><p>除了arc方法之外，其他使用路径绘制图形是会使用到的方法，先从绘制直线开始。绘制直线时，一般会用到moveTo与lineTo两种方法。它们的功能如下所示：</p>
+<ul>
+<li><p>moveTo</p>
+<p>  moveTo方法的作用是将光标移动到指定坐标点，绘制直线的时候以这个坐标点为起点。该方法的定义为moveTo(x,y)。该方法使用两个参数——x表示指定坐标点的横坐标，y表示指定坐标点的纵坐标。</p>
+</li>
+<li><p>lineTo</p>
+<p>  lineTo方法在moveTo方法中指定的直线起点与参数中指定的直线终点之间绘制一条直线。该方法的定义为lineTo(x,y)。与moveTo方法一样，它使用两个参数，x表示直线终点的横坐标，y表示直线终点纵坐标的纵坐标。使用该方法绘制完直线后，光标自动移动到lineTo方法参数所指定的直线终点。</p>
+</li>
+</ul>
+<p>因此，在创建路径时，需要使用moveTo方法将光标移动到指定的直线起点，在下一次使用lineTo方法的时候，会以当前光标所在的坐标点为直线起点，并在下一个用lineTo方法指定的直线终点之间创建路径，它会不断重复这个过程，来完成复杂图形的路径绘制。</p>
+<p>代码示例：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">draw</span>(<span class="params">id</span>)</span>&#123;</span><br><span class="line">    <span class="keyword">var</span> canvas = <span class="built_in">document</span>.getElementById(id);</span><br><span class="line">    <span class="keyword">if</span>(canvas == <span class="literal">null</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">var</span> context = canvas.getContext(<span class="string">'2d'</span>);</span><br><span class="line">    context.fillStyle = <span class="string">'#eef'</span>;</span><br><span class="line">    context.fillRect(<span class="number">0</span>, <span class="number">0</span>, <span class="number">400</span>, <span class="number">300</span>);</span><br><span class="line">    <span class="keyword">var</span> n = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">var</span> dx = <span class="number">150</span>;</span><br><span class="line">    <span class="keyword">var</span> dy = <span class="number">150</span>;</span><br><span class="line">    <span class="keyword">var</span> s = <span class="number">100</span>;</span><br><span class="line">    context.beginPath();</span><br><span class="line">    context.fillStyle = <span class="string">'rgb(100,255,100)'</span>;</span><br><span class="line">    context.strokeStyle = <span class="string">'rgb(0,0,100)'</span>;</span><br><span class="line">    <span class="keyword">var</span> x = <span class="built_in">Math</span>.sin(<span class="number">0</span>);</span><br><span class="line">    <span class="keyword">var</span> y = <span class="built_in">Math</span>.cos(<span class="number">0</span>);</span><br><span class="line">    <span class="keyword">var</span> dig = <span class="built_in">Math</span>.PI / <span class="number">15</span> *<span class="number">11</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>; i&lt;<span class="number">30</span>; i++)&#123;</span><br><span class="line">        <span class="keyword">var</span> x = <span class="built_in">Math</span>.sin(i * dig);</span><br><span class="line">        <span class="keyword">var</span> y = <span class="built_in">Math</span>.cos(i * dig);</span><br><span class="line">        context.lineTo( dx + x * s,dy + y * s);</span><br><span class="line">    &#125;</span><br><span class="line">    context.closePath();</span><br><span class="line">    context.fill();</span><br><span class="line">    context.stroke();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -162,6 +175,14 @@ context.beginPath();
 	
 <nav class="article-nav clearfix">
  
+ <div class="prev" >
+ <a href="/2016/09/05/JavaScript闭包/" title="JavaScript闭包">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  JavaScript闭包</span>
+</a>
+</div>
+
 
 <div class="next">
 <a href="/2016/07/20/canvas绘制矩形/"  title="canvas绘制矩形">
@@ -179,7 +200,7 @@ context.beginPath();
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目录</strong>
-  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#H5学习之canvas——绘制圆形"><span class="toc-number">1.</span> <span class="toc-text">H5学习之canvas——绘制圆形</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#如果没有关闭路径会怎样"><span class="toc-number">1.0.1.</span> <span class="toc-text">如果没有关闭路径会怎样</span></a></li></ol></li></ol></li></ol>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#H5学习之canvas——绘制圆形"><span class="toc-number">1.</span> <span class="toc-text">H5学习之canvas——绘制圆形</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#如果没有关闭路径会怎样"><span class="toc-number">1.0.1.</span> <span class="toc-text">如果没有关闭路径会怎样</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#绘制复杂图形"><span class="toc-number">2.</span> <span class="toc-text">绘制复杂图形</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#moveTo与lineTo"><span class="toc-number">2.1.</span> <span class="toc-text">moveTo与lineTo</span></a></li></ol></li></ol>
   </div>
 
 <div id="asidepart">
@@ -194,6 +215,8 @@ context.beginPath();
 		<ul class="clearfix">
 		
 			<li><a href="/tags/HTML5/" title="HTML5">HTML5<sup>2</sup></a></li>
+		
+			<li><a href="/tags/JavaScript/" title="JavaScript">JavaScript<sup>1</sup></a></li>
 		
 			<li><a href="/tags/网络/" title="网络">网络<sup>1</sup></a></li>
 		
