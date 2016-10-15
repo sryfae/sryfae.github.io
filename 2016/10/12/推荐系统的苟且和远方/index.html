@@ -1,0 +1,398 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>推荐系统的苟且和远方 | sry blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="sry">
+    
+    <meta name="description" content="苟且和远方提到推荐系统，你们会首先想到什么？
+产品和运营们首先想到的就是打标签，而做过的人还会想到协同过滤（collaborative filter，下面简称CF）。
+是的，CF几乎是推荐系统发展史上浓墨重彩的一笔，其背后的思想简单深刻，在万物互联的今天，协同过滤的威力更加强大。CF看上去是一种技术">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="sry blog" title="sry blog"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="sry blog">sry blog</a></h1>
+				<h2 class="blog-motto">前端小白的学习之路</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归类</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:sryria.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/10/12/推荐系统的苟且和远方/" title="推荐系统的苟且和远方" itemprop="url">推荐系统的苟且和远方</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://sryria.com" title="sry">sry</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2016-10-12T02:40:46.000Z" itemprop="datePublished">2016-10-12</time>
+    更新日期:<time datetime="2016-10-12T02:51:06.990Z" itemprop="dateModified">2016-10-12</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#苟且和远方"><span class="toc-number">1.</span> <span class="toc-text">苟且和远方</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#bandit怎么结合CF"><span class="toc-number">2.</span> <span class="toc-text">bandit怎么结合CF</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#COFIBA算法"><span class="toc-number">3.</span> <span class="toc-text">COFIBA算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#关于EE问题的思考"><span class="toc-number">4.</span> <span class="toc-text">关于EE问题的思考</span></a></li></ol>
+		</div>
+		
+		<h3 id="苟且和远方"><a href="#苟且和远方" class="headerlink" title="苟且和远方"></a>苟且和远方</h3><p>提到推荐系统，你们会首先想到什么？</p>
+<p>产品和运营们首先想到的就是打标签，而做过的人还会想到协同过滤（collaborative filter，下面简称CF）。</p>
+<p>是的，CF几乎是推荐系统发展史上浓墨重彩的一笔，其背后的思想简单深刻，在万物互联的今天，协同过滤的威力更加强大。CF看上去是一种技术，不如说是一种方法论，不是机器在给你推荐，而是“集体智慧”在给你推荐。</p>
+<p>CF的基本假设就是“物以类聚，人以群分”，你的圈子决定了你能见到的物品。这很靠谱，但是却隐藏了一些重要的问题：作为用户的我们还可能看到新的东西吗？还可能有惊喜吗？还可能有圈子的流动吗？</p>
+<p>是咯，我就知道你会提出这么精妙的问题，要不然也不会有这篇文章了。毕竟你我都曾经站在高高的谷堆上唱过：“推荐系统不是只有眼前的苟且，还有诗和远方的田野”。这也是在推荐和广告界被大量研究的EE问题（Exploit &amp; Explore），Exploit就是眼前的苟且，Explore就是诗和远方的田野。</p>
+<p>做Explore的方法有很多，bandit算法是其中的一种流派。前面也介绍过几种bandit算法，基本上就是估计置信区间的做法，然后按照置信区间的上界来进行推荐，以UCB、LinUCB为代表。</p>
+<p>作为要寻找诗和远方的bandit浪漫派算法，能不能和CF这种名门望族结合起来呢？事实上已经有人这么尝试过了，前阵子在arxiv看到一篇论文，题目是Collaborative Filtering Bandits[1]，arxiv上还有另一篇是同一作者先前的尝试（Online Clustering of Bandits）[2]，两者的区别是后者只对用户聚类（即只考虑了User-based的协同过滤），而前者采用了协同聚类（co-clustering，可以理解为item-based和user-based两种协同方式在同时进行），后者算是前者的一个特殊情况。今天我们就一起来开拓一下思路，看看Collaborative Filtering Bandits这篇文章是如何把CF和Bandit结合起来的。</p>
+<h3 id="bandit怎么结合CF"><a href="#bandit怎么结合CF" class="headerlink" title="bandit怎么结合CF"></a>bandit怎么结合CF</h3><p>很多推荐场景中都有这两个规律：</p>
+<ol>
+<li>相似的用户对同一个物品的反馈可能是一样的。也就是对一个聚类用户群体推荐同一个item，他们可能都喜欢，也可能都不喜欢，同样地，同一个用户会对相似的物品反馈相同。这是属于CF可以解决的问题；</li>
+<li>在使用推荐系统过程中，用户的决策是动态进行的，尤其是新用户。这就导致无法提前为用户准备好推荐候选，只能“走一步看一步”，是一个动态的推荐过程。</li>
+</ol>
+<p>这篇文章就提出，每一个推荐候选item，都可以根据用户对其偏好不同（payoff不同）将用户聚类成不同的群体，一个群体来集体预测这个item的可能的收益，这就有了协同的效果，然后再实时观察真实反馈回来更新用户的个人参数，这就有了bandit的思想在里面。</p>
+<p>举个例子，如果你父母给你安排了很多相亲对象，要不要见面去相一下？那需要提前看看每一个相亲对象的资料，每次大家都分成好几派，有说好的，有说再看看的，也有说不行的；你自己也会是其中一派的一员，每次都是你所属的那一派给你集体打分，因为他们是和你“三观一致的人”，“诚不欺我”；这样从一堆资料中挑出分数最高的那个人，你出去见TA，回来后把实际感觉说给大家听，同时自己心里的标准也有些调整，重新给剩下的其它对象打分，打完分再去见，周而复始……</p>
+<p>以上就是CF和bandit结合的思想。</p>
+<p>另外，如果要推荐的候选item较多，还需要对item进行聚类，这样就不用按照每一个item对user聚类，而是按照每一个item的类簇对user聚类，如此以来，item的类簇数相对于item数要大大减少。</p>
+<h3 id="COFIBA算法"><a href="#COFIBA算法" class="headerlink" title="COFIBA算法"></a>COFIBA算法</h3><p>基于这些思想，文中设计的算法COFIBA（读作coffee bar），简要描述如下：</p>
+<blockquote>
+<p>在时刻t，有一个用户来访问推荐系统，推荐系统需要从已有的候选池子中挑一个最佳的物品推荐给他，然后观察他的反馈，用观察到的反馈来更新挑选策略。 这里的每个物品都有一个特征向量，所以这里的bandit算法是context相关的。 这里依然是用岭回归去拟合用户的权重向量，用于预测用户对每个物品的可能反馈（payoff），这一点和我们上一次介绍的linUCB算法是一样的。</p>
+</blockquote>
+<p>对比上一次介绍的LinUCB算法，COFIBA的不同有两个：</p>
+<ol>
+<li>基于用户聚类挑选最佳的item（相似用户集体决策的bandit）</li>
+<li>基于用户的反馈情况调整user和item的聚类（CF部分）</li>
+</ol>
+<p>整体算法过程如下：</p>
+<p><img src="http://i.imgur.com/6EtbLEG.png" alt=""></p>
+<p>对关键部分用人话来说就是：</p>
+<blockquote>
+<p>在针对某个用户i，在每一轮试验时做以下事情：</p>
+<ol>
+<li>首先计算该用户的bandit参数W（和LinUCB相同），但是这个参数并不直接参与到bandit的选择决策中（和LinUCB不同），而是用来更新用户聚类的；</li>
+<li>遍历候选item，每一个item表示成一个context向量了。</li>
+<li>每一个item都对应一套用户聚类结果，所以遍历到每一个item时判断当前用户在当前item下属于哪个类簇，然后把对应类簇中每个用户的M矩阵(对应LinUCB里面的A矩阵)，b向量（payoff向量，对应linUCB里面的b向量）聚合起来，从而针对这个类簇求解一个岭回归参数（类似LinUCB里面单独针对每个用户所做），同时计算其payoff预测值和置信上边界</li>
+<li>每个item都得到一个payoff预测值及置信区间上界，挑出那个上边界最大的item推出去（和LinUCB相同）</li>
+<li>观察用户的真实反馈，然后更新用户自己的M矩阵和b向量（更新个人的，对应类簇里其他的不更新）</li>
+</ol>
+</blockquote>
+<p>以上是COFIBA算法的一次决策过程。在收到用户真实反馈之后，还有两个计算过程：</p>
+<ol>
+<li>更新user聚类</li>
+<li>更新item聚类</li>
+</ol>
+<p>如何更新user和item的聚类呢？文章中给出了一个示意图：</p>
+<p><img src="http://i.imgur.com/akD58zr.png" alt=""></p>
+<p>解释一下这个图。</p>
+<blockquote>
+<p>(a) 这里有6个user，8个item，初始化时，user和item的类簇个数都是1<br>(b1) 在某一轮试验时，推荐系统面对的用户是4。推荐过程就是遍历1～8每个item，然后看看对应每个item时，user4在哪个类簇中，把对应类簇中的用户聚合起来为这个item预测payoff和CB。这里假设最终item5胜出，被推荐出去了。<br>(b2) 在时刻t，item有3个类簇，需要更新的用户聚类是item5对应的user4所在类簇。更新方式：看看该类簇里面除了user4之外的用户，对item5的payoff是不是和user4相近，如果是，则保持原来的连接边，否则删除原来的连接边。删除边之后重新构建聚类结果。这里假设重新构建后原来user4所在的类簇分裂成了两个类簇：{4,5}和{6}<br>(c) 更新完用户类簇后，item5对应的类簇也要更新。更新方式是：对于每一个和item5(被推荐出的那个item)还存在连接边的item j，都去构造一个user的近邻集合N，这个集合的用户对item j有相近的payoff，然后看看N是不是和刚刚更新后的user4所在的类簇相同，是的话，保留item5和item j之间的连接边，否则删除。这里假设item 3和item 5之间的连接边被删除。item3独立后给他初始化了一个聚类结果：所有用户还是一个类簇。</p>
+</blockquote>
+<p>简单来说就是这样：</p>
+<ul>
+<li>User-based协同过滤来选择要推荐的item，选择时用了LinUCB的思想</li>
+<li>根据用户的反馈，调整User-based和Item-based的聚类结果</li>
+<li>Item-based的聚类变化又改变了User的聚类</li>
+<li>不断根据用户实时动态的反馈来划分User-Item矩阵</li>
+</ul>
+<p>cofiba算法也很容易实现，github上就有[3]。论文也从理论和实验两方面证明了它的有效性，但是能否在实际项目中用上，仍然存疑，毕竟复杂度不低。</p>
+<h3 id="关于EE问题的思考"><a href="#关于EE问题的思考" class="headerlink" title="关于EE问题的思考"></a>关于EE问题的思考</h3><p>之所以想写bandit算法系列，是因为Exploit-Explore这一对矛盾一直客观存在，而bandit算法是公认的一种比较好的解决EE问题的方案。除了bandit算法之外，还有一些其他的explore的办法，比如跟xlvector大牛讨论时，他就提到一种：在推荐时，随机地去掉一些用户历史行为（特征）。</p>
+<p>解决Explore，势必就是要冒险，势必要走向未知，而这显然就是会伤害用户体验的：明知道用户肯定喜欢A，你还偏偏以某个小概率给推荐非A。</p>
+<p>实际上，很少有公司会采用这些理性的办法做Explore，反而更愿意用一些盲目主观的方式。究其原因，可能是因为：</p>
+<ol>
+<li>互联网产品生命周期短，而Explore又是为了提升长期利益的，所以没有动力做。</li>
+<li>用户使用互联网产品时间越来越碎片化，Explore的时间长，难以体现出Explore 的价值。</li>
+<li>同质化互联网产品多，用户选择多，稍有不慎，用户用脚投票，分分钟弃你于不顾。</li>
+<li>已经成规模的平台，红利杠杠的，其实是没有动力做Explore的。</li>
+</ol>
+<p>基于这些，我们如果想在自己的推荐系统中引入Explore机制，需要注意以下几点：<br>用于Explore的item要保证其本身质量，纵使用户不感兴趣，也不至于引起其反感。<br>Explore本身的产品需要精心设计，让用户有耐心陪你玩儿。<br>深度思考，这样才不会做出脑残的产品，产品不会早早夭折，才有可能让Explore机制有用武之地。</p>
+<p>好了，让我们再唱一遍，结束本系列。</p>
+<blockquote>
+<p>推荐不止眼前的苟且，还有诗和远方的田野。</p>
+</blockquote>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/bandit-CF/">bandit&CF</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://sryria.com/2016/10/12/推荐系统的苟且和远方/" data-title="推荐系统的苟且和远方 | sry blog" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+
+<div class="next">
+<a href="/2016/10/12/UCB算法升职记——LinUCB算法/"  title="UCB算法升职记——LinUCB算法">
+ <strong>NEXT:</strong><br/> 
+ <span>UCB算法升职记——LinUCB算法
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#苟且和远方"><span class="toc-number">1.</span> <span class="toc-text">苟且和远方</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#bandit怎么结合CF"><span class="toc-number">2.</span> <span class="toc-text">bandit怎么结合CF</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#COFIBA算法"><span class="toc-number">3.</span> <span class="toc-text">COFIBA算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#关于EE问题的思考"><span class="toc-number">4.</span> <span class="toc-text">关于EE问题的思考</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/HTML5/" title="HTML5">HTML5<sup>2</sup></a></li>
+		
+			<li><a href="/tags/JavaScript/" title="JavaScript">JavaScript<sup>1</sup></a></li>
+		
+			<li><a href="/tags/bandit-CF/" title="bandit&amp;CF">bandit&amp;CF<sup>3</sup></a></li>
+		
+			<li><a href="/tags/协同过滤算法学习/" title="协同过滤算法学习">协同过滤算法学习<sup>2</sup></a></li>
+		
+			<li><a href="/tags/网络/" title="网络">网络<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		<a href="http://weibo.com/2495479173" target="_blank" title="weibo"></a>
+		
+		
+		
+		<a href="https://github.com/sryfae" target="_blank" title="github"></a>
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2016 
+		
+		<a href="http://sryria.com" target="_blank" title="sry">sry</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+  </body>
+</html>

@@ -1,0 +1,407 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>专治选择困难症——bandit算法 | sry blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="sry">
+    
+    <meta name="description" content="选择是一个技术活著名鸡汤学家沃·滋基硕德曾说过：选择比努力重要。
+我们会遇到很多选择的场景。上哪个大学，学什么专业，去哪家公司，中午吃什么，等等。这些事情，都让选择困难症的我们头很大。那么，有办法能够应对这些问题吗？
+答案是：有！而且是科学的办法，而不是「走近科学」的办法。那就是bandit算法！
+">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="sry blog" title="sry blog"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="sry blog">sry blog</a></h1>
+				<h2 class="blog-motto">前端小白的学习之路</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归类</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:sryria.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/10/12/专治选择困难症——bandit算法/" title="专治选择困难症——bandit算法" itemprop="url">专治选择困难症——bandit算法</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://sryria.com" title="sry">sry</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2016-10-12T01:47:22.000Z" itemprop="datePublished">2016-10-12</time>
+    更新日期:<time datetime="2016-10-12T02:33:53.664Z" itemprop="dateModified">2016-10-12</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#选择是一个技术活"><span class="toc-number">1.</span> <span class="toc-text">选择是一个技术活</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#bandit算法哪家强"><span class="toc-number">2.</span> <span class="toc-text">bandit算法哪家强</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#几个bandit算法"><span class="toc-number">2.1.</span> <span class="toc-text">几个bandit算法</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#用bandit算法解决推荐系统冷启动的简单思路"><span class="toc-number">3.</span> <span class="toc-text">用bandit算法解决推荐系统冷启动的简单思路</span></a></li></ol>
+		</div>
+		
+		<h3 id="选择是一个技术活"><a href="#选择是一个技术活" class="headerlink" title="选择是一个技术活"></a>选择是一个技术活</h3><p>著名鸡汤学家沃·滋基硕德曾说过：选择比努力重要。</p>
+<p>我们会遇到很多选择的场景。上哪个大学，学什么专业，去哪家公司，中午吃什么，等等。这些事情，都让选择困难症的我们头很大。那么，有办法能够应对这些问题吗？</p>
+<p>答案是：有！而且是科学的办法，而不是「走近科学」的办法。那就是bandit算法！</p>
+<p>bandit算法来源于人民群众喜闻乐见的赌博学，它要解决的问题是这样的：</p>
+<p>一个赌徒，要去摇老虎机，走进赌场一看，一排老虎机，外表一模一样，但是每个老虎机吐钱的概率可不一样，他不知道每个老虎机吐钱的概率分布是什么，那么想最大化收益该怎么整？这就是多臂赌博机问题（Multi-armed bandit problem, K-armed bandit problem, MAB）。</p>
+<p>怎么解决这个问题呢？求菩萨？拜赌神？都不好使，最好的办法是去试一试，而这个试一试也不是盲目地试，而是有策略地试，越快越好，这些策略就是bandit算法。</p>
+<p>这个多臂问题，它是一个可以装下很多问题的万能框：</p>
+<ol>
+<li>假设一个用户对不同类别的内容感兴趣程度不同，那么我们的推荐系统初次见到这个用户时，怎么快速地知道他对每类内容的感兴趣程度？这就是推荐系统的冷启动。</li>
+<li>假设我们有若干广告库存，怎么知道该给每个用户展示哪个广告，从而获得最大的点击收益？是每次都挑效果最好那个么？那么新广告如何才有出头之日？</li>
+<li>我们的算法工程师又想出了新的模型，有没有比A/B test更快的方法知道它和旧模型相比谁更靠谱？</li>
+<li>…</li>
+</ol>
+<p>全都是关于选择的问题。只要是关于选择的问题，都可以简化成一个多臂赌博机问题，毕竟小赌怡情嘛，人生何处不赌博。</p>
+<p>特别提出，在计算广告和推荐系统领域，针对这个问题，还有个说法叫做EE问题：exploit－explore问题。</p>
+<p>exploit意思就是：比较确定的兴趣，当然要用啊。好比说我们已经挣到的钱，当然要花啊；</p>
+<p>explore意思就是：不断探索用户新的兴趣才行，不然很快就会出现一模一样的反复推荐。就好比我们虽然有一点钱可以花了，但是还得继续搬砖挣钱啊，不然花完了喝西北风啊。</p>
+<h3 id="bandit算法哪家强"><a href="#bandit算法哪家强" class="headerlink" title="bandit算法哪家强"></a>bandit算法哪家强</h3><p>现在来一本正经地介绍一下bandit算法怎么解决这类问题的。</p>
+<p><strong>我们的选择到底有多遗憾？</strong></p>
+<p>王家卫在《一代宗师》里寄出一句台词：</p>
+<blockquote>
+<p>人生要是无憾，那多无趣</p>
+</blockquote>
+<p>本文作者说：</p>
+<blockquote>
+<p>算法要是无憾，那应该是过拟合了。</p>
+</blockquote>
+<p>其实我想引出的是：怎么衡量不同bandit算法解决多臂问题的好坏？多臂问题里有一个概念叫做累计遗憾(regret)<br><img src="http://i.imgur.com/y7W0yRL.png" alt=""></p>
+<p>解释一下这个公式：</p>
+<blockquote>
+<p>首先，这里我们讨论的每个臂的收益非0即1，也就是伯努利收益。</p>
+<p>公式1最直接：每次选择后，上帝都告诉你，和本该最佳的选择差了多少，然后把每次差距累加起来就是总的遗憾。</p>
+<p>wB(i)是第i次试验时被选中臂的期望收益， w*是所有臂中的最佳那个，如果上帝提前告诉你，我们当然每次试验都选它，问题是上帝不告诉你，所以我们就有了这篇文章。</p>
+</blockquote>
+<p>这个公式可以用来对比不同bandit算法的效果：对同样的多臂问题，用不同的bandit算法试验相同次数，看看谁的regret增长得慢。</p>
+<p>本着大家可以直接堆代码的原则，所以本文跳过一切数学上的分析，赤裸裸地陈列出最常用的几个bandit算法。</p>
+<h4 id="几个bandit算法"><a href="#几个bandit算法" class="headerlink" title="几个bandit算法"></a>几个bandit算法</h4><p>第一个，Thompson sampling算法。这个算法我喜欢它，因为它只有一行代码就可以实现。简单介绍一下它的原理：</p>
+<blockquote>
+<p>假设每个臂是否产生收益，其背后有一个概率分布，产生收益的概率为p<br>我们不断地试验，去估计出一个置信度较高的概率p的概率分布就能近似解决这个问题了。</p>
+<p>怎么能估计概率p的概率分布呢？ 答案是假设概率p的概率分布符合beta(wins, lose)分布，它有两个参数: wins, lose。</p>
+<p>每个臂都维护一个beta分布的参数。每次试验后，选中一个臂，摇一下，有收益则该臂的wins增加1，否则该臂的lose增加1。</p>
+<p>每次选择臂的方式是：用每个臂现有的beta分布产生一个随机数b，选择所有臂产生的随机数中最大的那个臂去摇。</p>
+<p>以上就是Thompson采样，用python实现就一行：<br>choice = numpy.argmax(pymc.rbeta(1 + self.wins, 1 + self.trials - self.wins))</p>
+</blockquote>
+<p>第二个是UCB算法，UCB算法全称是Upper Confidence Bound（置信区间上界），不多说了，它的算法步骤如下[4]：</p>
+<blockquote>
+<p>先对每一个臂都试一遍</p>
+<p>之后，每次选择以下值最大的那个臂<br><img src="http://i.imgur.com/D3bfWBI.png" alt=""></p>
+<p>其中加号前面是这个臂到目前的收益均值，后面的叫做bonus，本质上是均值的标准差，t是目前的试验次数，Tjt是这个臂被试次数。</p>
+<p>这个公式反映：均值越大，标准差越小，被选中的概率会越来越大，起到了exploit的作用；同时哪些被选次数较少的臂也会得到试验机会，起到了explore的作用。</p>
+</blockquote>
+<p>第三个是Epsilon-Greedy算法。这是一个朴素的算法，也很简单有效，有点类似模拟退火：</p>
+<blockquote>
+<p>选一个(0,1)之间较小的数epsilon。</p>
+<p>每次以概率epsilon（产生一个[0,1]之间的随机数，比epsilon小）做一件事：所有臂中随机选一个。否则，选择截止当前，平均收益最大的那个臂。</p>
+<p>是不是简单粗暴？epsilon的值可以控制对Exploit和Explore的偏好程度。越接近0，越保守，只想花钱不想挣钱。</p>
+</blockquote>
+<p>最后还有一个完全是朴素的：</p>
+<blockquote>
+<p>先试几次，每个臂都有了均值之后，一直选均值最大那个臂。这个算法是我们人类在实际中最常采用的，不可否认，它还是比随机乱猜要好。</p>
+</blockquote>
+<p>以上五个算法，我们用10000次模拟试验的方式对比了其效果如图：</p>
+<p><img src="http://i.imgur.com/BAwtTC0.png" alt=""></p>
+<p>算法效果对比一目了然：UCB算法和Thompson采样算法显著优秀一些。<br>至于你实际上要选哪一种bandit算法，你可以选一种bandit算法来选bandit算法。。。</p>
+<h3 id="用bandit算法解决推荐系统冷启动的简单思路"><a href="#用bandit算法解决推荐系统冷启动的简单思路" class="headerlink" title="用bandit算法解决推荐系统冷启动的简单思路"></a>用bandit算法解决推荐系统冷启动的简单思路</h3><blockquote>
+<p>我想，屏幕前的你已经想到了，推荐系统冷启动可以用bandit算法来解决一部分。大致思路如下：</p>
+<p>用分类或者Topic来表示每个用户兴趣，我们可以通过几次试验，来刻画出新用户心目中对每个topic的感兴趣概率。</p>
+<p>这里，如果用户对某个topic感兴趣，就表示我们得到了收益，如果推给了它不感兴趣的topic，推荐系统就表示很遗憾(regret)了。</p>
+<p>当一个用户来了，针对这个用户，我们用Thompson算法为每一个topic采样一个随机数，排序后，输出采样值top N 的推荐item。注意，这里略有改动，原始多臂问题每次只摇一个臂，我们这里一次摇N个臂。</p>
+<p>获取用户的反馈，比如点击。没有反馈则更新对应topic的lose值，点击了则更新对应topic的wins值。</p>
+</blockquote>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/bandit-CF/">bandit&CF</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://sryria.com/2016/10/12/专治选择困难症——bandit算法/" data-title="专治选择困难症——bandit算法 | sry blog" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2016/10/12/UCB算法升职记——LinUCB算法/" title="UCB算法升职记——LinUCB算法">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  UCB算法升职记——LinUCB算法</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2016/09/21/推荐系统学习-2/"  title="推荐系统学习-2">
+ <strong>NEXT:</strong><br/> 
+ <span>推荐系统学习-2
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#选择是一个技术活"><span class="toc-number">1.</span> <span class="toc-text">选择是一个技术活</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#bandit算法哪家强"><span class="toc-number">2.</span> <span class="toc-text">bandit算法哪家强</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#几个bandit算法"><span class="toc-number">2.1.</span> <span class="toc-text">几个bandit算法</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#用bandit算法解决推荐系统冷启动的简单思路"><span class="toc-number">3.</span> <span class="toc-text">用bandit算法解决推荐系统冷启动的简单思路</span></a></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/HTML5/" title="HTML5">HTML5<sup>2</sup></a></li>
+		
+			<li><a href="/tags/JavaScript/" title="JavaScript">JavaScript<sup>1</sup></a></li>
+		
+			<li><a href="/tags/bandit-CF/" title="bandit&amp;CF">bandit&amp;CF<sup>3</sup></a></li>
+		
+			<li><a href="/tags/协同过滤算法学习/" title="协同过滤算法学习">协同过滤算法学习<sup>2</sup></a></li>
+		
+			<li><a href="/tags/网络/" title="网络">网络<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		<a href="http://weibo.com/2495479173" target="_blank" title="weibo"></a>
+		
+		
+		
+		<a href="https://github.com/sryfae" target="_blank" title="github"></a>
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2016 
+		
+		<a href="http://sryria.com" target="_blank" title="sry">sry</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+  </body>
+</html>

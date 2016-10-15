@@ -1,0 +1,393 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>推荐系统学习-1 | sry blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="sry">
+    
+    <meta name="description" content="推荐算法学习-1一个新的推荐算法最终上线，需要完成3个实验。
+
+首先，需要通过离线实验证明它在很多离线指标上优于现有算法。
+然后，需要通过用户调查确定它的用户满意度不低于现有的算法。
+最后，通过在线的AB测试确定它在我们关心的指标上优于现有的算法。
+
+推荐算法评测指标用户满意度在在线系统中，用户满意">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="sry blog" title="sry blog"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="sry blog">sry blog</a></h1>
+				<h2 class="blog-motto">前端小白的学习之路</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归类</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:sryria.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/09/19/推荐系统学习-1/" title="推荐系统学习-1" itemprop="url">推荐系统学习-1</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://sryria.com" title="sry">sry</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2016-09-19T08:33:21.000Z" itemprop="datePublished">2016-09-19</time>
+    更新日期:<time datetime="2016-09-21T07:59:12.319Z" itemprop="dateModified">2016-09-21</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#推荐算法学习-1"><span class="toc-number">1.</span> <span class="toc-text">推荐算法学习-1</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#推荐算法评测指标"><span class="toc-number">1.1.</span> <span class="toc-text">推荐算法评测指标</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#用户满意度"><span class="toc-number">1.1.1.</span> <span class="toc-text">用户满意度</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#预测准确度"><span class="toc-number">1.1.2.</span> <span class="toc-text">预测准确度</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#评分预测"><span class="toc-number">1.1.2.1.</span> <span class="toc-text"> *评分预测</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#TopN推荐"><span class="toc-number">1.1.2.2.</span> <span class="toc-text"> *TopN推荐</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#覆盖率"><span class="toc-number">1.1.3.</span> <span class="toc-text">覆盖率</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#多样性"><span class="toc-number">1.1.4.</span> <span class="toc-text">多样性</span></a></li></ol></li></ol></li></ol>
+		</div>
+		
+		<h1 id="推荐算法学习-1"><a href="#推荐算法学习-1" class="headerlink" title="推荐算法学习-1"></a>推荐算法学习-1</h1><p>一个新的推荐算法最终上线，需要完成3个实验。</p>
+<ol>
+<li>首先，需要通过离线实验证明它在很多离线指标上优于现有算法。</li>
+<li>然后，需要通过用户调查确定它的用户满意度不低于现有的算法。</li>
+<li>最后，通过在线的AB测试确定它在我们关心的指标上优于现有的算法。</li>
+</ol>
+<h2 id="推荐算法评测指标"><a href="#推荐算法评测指标" class="headerlink" title="推荐算法评测指标"></a>推荐算法评测指标</h2><h3 id="用户满意度"><a href="#用户满意度" class="headerlink" title="用户满意度"></a>用户满意度</h3><p>在在线系统中，用户满意度主要通过一些对用户行为的统计得到。比如在电子商务网站中，用户如果购买了推荐的商品，就表示他们在一定程度上满意。因此，我们可以利用购买率度量用户的满意度。此外，有些网站会通过设计一些用户反馈界面收集用户满意度。比如在豆瓣网络电台中，都有对推荐结果满意或者不满意的反馈按钮，通过统计两种按钮的点击情况就可以度量系统的满意度。更一般的情况下，我们可以用点击率、用户停留时间和转化率等指标度量用户的满意度。</p>
+<h3 id="预测准确度"><a href="#预测准确度" class="headerlink" title="预测准确度"></a>预测准确度</h3><p>预测准确度是最重要的推荐系统离线评测指标，几乎99%与推荐相关的论文都在讨论这个指标。主要是因为该指标可以通过离线实验计算，方便很多学术界的研究人员研究推荐算法。</p>
+<p>在计算该指标时需要有一个离线的数据集，该数据集包含用户的行为记录。然后，将该数据集通过时间分成训练集和测试集。最后，通过在训练集上建立用户的行为和兴趣模型预测用户在测试集上的行为，并计算预测行为和测试集上的行为，并计算预测行为和测试集上实际行为的重合度作为预测准确度。</p>
+<p>由于离线的推荐算法有不同的研究方向，因此下面将针对不同的研究方向介绍它们的预测准确度指标。</p>
+<h4 id="评分预测"><a href="#评分预测" class="headerlink" title=" *评分预测"></a><em> <em>*评分预测</em></em></h4><p>评分预测的预测准确度一般通过均方根误差(<strong>RMSE</strong>)和平均绝对误差(<strong>MAE</strong>)计算。对于测试集中的一个用户<strong>u</strong>和物品<strong>i</strong>。令<img src="http://i.imgur.com/E7bZlXC.png" style="display: inline;">是用户<strong>u</strong>对物品<strong>i</strong>的实际评分，而<img src="http://i.imgur.com/W1vv9uS.png" style="display:inline;">是推荐算法给出的预测评分，那么<strong>RMSE</strong>的定义为：</p>
+<blockquote>
+<p><img src="http://i.imgur.com/QEDTTg8.png" alt=""></p>
+</blockquote>
+<p>MAE采用绝对值计算预测误差，它的定义为：</p>
+<blockquote>
+<p><img src="http://i.imgur.com/nBLxLus.png" alt=""></p>
+</blockquote>
+<p>假设我们用一个列表<strong>records</strong>存放用户评分数据，令<strong>records[i] = [u,i,rui,pui]</strong>,其中<strong>rui</strong>是用户<strong>u</strong>对物品<strong>i</strong>的实际评分，<strong>pui</strong>是算法预测出来的用户<strong>u</strong>对物品<strong>i</strong>的评分<br>，那么下面代码分别实现了<strong>RMSE</strong>和<strong>MAE</strong>的计算过程。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">RMSE</span><span class="params">(records)</span>:</span></span><br><span class="line">	<span class="keyword">return</span> math.sqrt(\</span><br><span class="line">		sum([(rui-pui)*(rui-pui) <span class="keyword">for</span> u,i,rui,pui <span class="keyword">in</span> records])\</span><br><span class="line">			/ float(len(records))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">MAE</span><span class="params">(records)</span>:</span></span><br><span class="line">	<span class="keyword">return</span> sum([abs(rui-pui) <span class="keyword">for</span> u,i,rui,pui <span class="keyword">in</span> records])\</span><br><span class="line">		/ float(len(records))</span><br></pre></td></tr></table></figure></p>
+<p>关于<strong>RMSE</strong>和<strong>MAE</strong>这两个指标的优缺点，Netflix认为<strong>RMSE</strong>加大了对预测不准的用户物品评分的惩罚（平方项的惩罚），因而对系统的评测更加苛刻。<mark>研究表明，如果评分系统是基于整数建立的（即用户给的评分都是整数），那么对预测结果取整会降低MAE的误差。</mark></p>
+<h4 id="TopN推荐"><a href="#TopN推荐" class="headerlink" title=" *TopN推荐"></a><em> <em>*TopN推荐</em></em></h4><p>网站在提供推荐服务时，一般是给用户一个个性化的推荐列表，这种推荐叫做<strong>TopN</strong>推荐。<strong>TopN</strong>推荐的预测准确率（precision）/召回率（recall）度量。<br>令<strong>R(u)</strong>是根据用户在训练集上的行为给用户作出的推荐列表，而<strong>T(u)</strong>使用户在测试集上的行为列表。那么，推荐结果的召回率定义为：</p>
+<blockquote>
+<p><img src="http://i.imgur.com/Jm8PB1v.png" alt=""></p>
+</blockquote>
+<p>推荐结果的准确率定义为：</p>
+<blockquote>
+<p><img src="http://i.imgur.com/Gsm7dku.png" alt=""></p>
+</blockquote>
+<p>下面的Python代码同时计算出了一个推荐算法的准确率和召回率：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">PrecisionRecall</span><span class="params">(test,N)</span>:</span></span><br><span class="line">	hit = <span class="number">0</span></span><br><span class="line">	n_recall = <span class="number">0</span></span><br><span class="line">	n_precision = <span class="number">0</span></span><br><span class="line">	<span class="keyword">for</span> user,items <span class="keyword">in</span> test.items():</span><br><span class="line">		rank = Recommend(user,N)</span><br><span class="line">		hit += len(items)</span><br><span class="line">		n_recall += len(items)</span><br><span class="line">		n_precision += N</span><br><span class="line">	<span class="keyword">return</span> [hit / (<span class="number">1.0</span> * n_recall),hit / (<span class="number">1.0</span> * n_precision)]</span><br></pre></td></tr></table></figure></p>
+<p>有时候，为了全面评测<strong>TopN</strong>推荐的准确率和召回率，一般会选取不同的推荐列表长度<strong>N</strong>，计算出一组准确率/召回率，然后画出准确率/召回率曲线（<strong>precision/recall curve</strong>）</p>
+<h3 id="覆盖率"><a href="#覆盖率" class="headerlink" title="覆盖率"></a>覆盖率</h3><p>覆盖率描述一个推荐系统对物品长尾的发掘能力。覆盖率有不同的定义方法，最简单的定义为推荐系统能够推荐出来的物品占总物品集合的比列。假设系统的用户集合为<strong>U</strong>，推荐系统给每个用户推荐一个长度为<strong>N</strong>的物品列表<strong>R(u)</strong>。那么推荐系统的覆盖率可以通过下面的公式计算：</p>
+<blockquote>
+<p><img src="http://i.imgur.com/TzsP7Yy.png" alt=""></p>
+</blockquote>
+<p>从上面的定义可以看到，覆盖率是一个内容提供商会关心的指标。一个好的推荐系统不仅需要有比较高的用户满意度，也要有较高的覆盖率。</p>
+<p>可以通过研究物品在推荐列表中出现次数的分布描述系统挖掘长尾的能力。如果这个分布比较平，那么说明推荐系统的覆盖率较高，而如果这个分布比较陡峭，说明推荐系统的覆盖率较低。在信息论中和经济学中有两个著名的指标可以用来定义覆盖率。第一个是信息熵：</p>
+<blockquote>
+<p><img src="http://i.imgur.com/Zhlsuh9.png" alt=""></p>
+</blockquote>
+<p>这里<strong>p(i)</strong>是物品<strong>i</strong>的流行度除以所有物品流行度之和。<br>第二个指标是基尼系数:</p>
+<blockquote>
+<p><img src="http://i.imgur.com/gG0DjoA.png" alt=""></p>
+</blockquote>
+<p>这里，ij是按照物品流行度<strong>p()</strong>从小到大排序的物品列表中第<strong>j</strong>个物品。下面的代码可以用来计算给定物品流行度分布后的基尼系数：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">GiniIndex</span><span class="params">(p)</span>:</span></span><br><span class="line">	j = <span class="number">1</span></span><br><span class="line">	n = len(p)</span><br><span class="line">	G = <span class="number">0</span></span><br><span class="line">	<span class="keyword">for</span> item, weight <span class="keyword">in</span> sorted(p.item(), key=itemgetter(<span class="number">1</span>)):</span><br><span class="line">		G += (<span class="number">2</span>*j-n<span class="number">-1</span>)*weight</span><br><span class="line">	<span class="keyword">return</span> G / float(n<span class="number">-1</span>)</span><br></pre></td></tr></table></figure></p>
+<p><img src="http://i.imgur.com/MmOtMVf.png" alt=""></p>
+<h3 id="多样性"><a href="#多样性" class="headerlink" title="多样性"></a>多样性</h3><p>多样性描述了推荐列表中物品两两之间的不相似性。因此，多样性和相似性是对应的。假设<img src="http://i.imgur.com/5spR744.png" style="display:inline;">定义了物品i和j之间的相似度，那么用户u的推荐列表**R(u)的多样性定义如下:</p>
+<blockquote>
+<p><img src="http://i.imgur.com/YIcCnek.png" alt=""></p>
+</blockquote>
+<p>而推荐系统的整体多样性可以定义为所有用户推荐列表多样性的平均值：</p>
+<blockquote>
+<p><img src="http://i.imgur.com/HXdDREO.png" alt=""></p>
+</blockquote>
+<p>从上面的定义可以看到，不同的物品相似度度量函数<strong>s(i,j)</strong>可以定义不同的多样性。如果用内容相似度描述物品间的相似度，我们就可以得到内容多样性函数，如果用协同过滤的相似度函数描述物品间的相似度，就可以得到协同过滤的多样性函数。</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/协同过滤算法学习/">协同过滤算法学习</a>
+  </div>
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://sryria.com/2016/09/19/推荐系统学习-1/" data-title="推荐系统学习-1 | sry blog" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2016/09/21/推荐系统学习-2/" title="推荐系统学习-2">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  推荐系统学习-2</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2016/09/06/JavaScript异步/"  title="JavaScript异步">
+ <strong>NEXT:</strong><br/> 
+ <span>JavaScript异步
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#推荐算法学习-1"><span class="toc-number">1.</span> <span class="toc-text">推荐算法学习-1</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#推荐算法评测指标"><span class="toc-number">1.1.</span> <span class="toc-text">推荐算法评测指标</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#用户满意度"><span class="toc-number">1.1.1.</span> <span class="toc-text">用户满意度</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#预测准确度"><span class="toc-number">1.1.2.</span> <span class="toc-text">预测准确度</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#评分预测"><span class="toc-number">1.1.2.1.</span> <span class="toc-text"> *评分预测</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#TopN推荐"><span class="toc-number">1.1.2.2.</span> <span class="toc-text"> *TopN推荐</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#覆盖率"><span class="toc-number">1.1.3.</span> <span class="toc-text">覆盖率</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#多样性"><span class="toc-number">1.1.4.</span> <span class="toc-text">多样性</span></a></li></ol></li></ol></li></ol>
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/HTML5/" title="HTML5">HTML5<sup>2</sup></a></li>
+		
+			<li><a href="/tags/JavaScript/" title="JavaScript">JavaScript<sup>1</sup></a></li>
+		
+			<li><a href="/tags/bandit-CF/" title="bandit&amp;CF">bandit&amp;CF<sup>3</sup></a></li>
+		
+			<li><a href="/tags/协同过滤算法学习/" title="协同过滤算法学习">协同过滤算法学习<sup>2</sup></a></li>
+		
+			<li><a href="/tags/网络/" title="网络">网络<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		<a href="http://weibo.com/2495479173" target="_blank" title="weibo"></a>
+		
+		
+		
+		<a href="https://github.com/sryfae" target="_blank" title="github"></a>
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2016 
+		
+		<a href="http://sryria.com" target="_blank" title="sry">sry</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+  </body>
+</html>

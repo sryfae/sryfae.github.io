@@ -1,0 +1,379 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>JavaScript异步 | sry blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="sry">
+    
+    <meta name="description" content="JS 中最基础的异步调用方式是 callback，它将回调函数 callback 传给异步 API，由浏览器或 Node 在异步完成后，通知 JS 引擎调用 callback。对于简单的异步操作，用 callback 实现，是够用的。但随着负责交互页面和 Node 出现，callback 方案的弊端">
+    
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.svg" alt="sry blog" title="sry blog"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="sry blog">sry blog</a></h1>
+				<h2 class="blog-motto">前端小白的学习之路</h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					
+						<li><a href="/">首页</a></li>
+					
+						<li><a href="/archives">归类</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:sryria.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2016/09/06/JavaScript异步/" title="JavaScript异步" itemprop="url">JavaScript异步</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://sryria.com" title="sry">sry</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2016-09-06T07:30:44.000Z" itemprop="datePublished">2016-09-06</time>
+    更新日期:<time datetime="2016-09-06T07:31:04.075Z" itemprop="dateModified">2016-09-06</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+		</div>
+		
+		<p>JS 中最基础的异步调用方式是 callback，它将回调函数 callback 传给异步 API，由浏览器或 Node 在异步完成后，通知 JS 引擎调用 callback。对于简单的异步操作，用 callback 实现，是够用的。但随着负责交互页面和 Node 出现，callback 方案的弊端开始浮现出来。 Promise 规范孕育而生，并被纳入 ES6 的规范中。后来 ES7 又在 Promise 的基础上将 async 函数纳入标准。此为 JavaScript 异步进化史。</p>
+<p>同步与异步</p>
+<p>通常，代码是由上往下依次执行的。如果有多个任务，就必需排队，前一个任务完成，后一个任务才会执行。这种执行模式称之为：同步（synchronous）。新手容易把计算机用语中的同步，和日常用语中的同步弄混淆。如，“把文件同步到云端”中的同步，指的是“使…保持一致”。而在计算机中，同步指的是任务从上往下依次执行的模式。比如：<br>A();<br>B();<br>C();<br>在这段代码中，A、B、C是三个不同的函数，每个函数都是一个不相关的任务。在同步模式，计算机会先执行 A 任务，再执行 B 任务，最后执行 C 任务。在大部分情况，同步模式都没问题。但是如果 B 任务是一个耗时很长的网络请求，而 C 任务恰好是展现新页面，就会导致网页卡顿。<br>更好解决方案是，将 B 任务分成两个部分。一部分立即执行网络请求的任务，另一部分在请求回来后的执行任务。这种一部分立即执行，另一部分在未来执行的模式称为异步。<br>A();<br>// 在现在发送请求<br>ajax(‘url1’,function B() {<br>  // 在未来某个时刻执行<br>})<br>C();<br>// 执行顺序 A =&gt; C =&gt; B<br>实际上，JS 引擎并没有直接处理网络请求的任务，它只是调用了浏览器的网络请求接口，由浏览器发送网络请求并监听返回的数据。JavaScript 异步能力的本质是浏览器或 Node 的多线程能力。<br>callback </p>
+<p>未来执行的函数通常也叫 callback。使用 callback 的异步模式，解决了阻塞的问题，但是也带来了一些其他问题。在最开始，我们的函数是从上往下书写的，也是从上往下执行的，这种“线性”模式，非常符合我们的思维习惯，但是现在却被 callback 打断了！在上面一段代码中，现在它跳过 B 任务先执行了 C任务！这种异步“非线性”的代码会比同步“线性”的代码，更难阅读，因此也更容易滋生 BUG。</p>
+<p>试着判断下面这段代码的执行顺序，你会对“非线性”代码比“线性”代码更难以阅读，体会更深。<br>A();</p>
+<p>ajax(‘url1’, function(){<br>    B();</p>
+<pre><code>ajax(&apos;url2&apos;, function(){
+    C();
+}
+D();
+</code></pre><p>});<br>E();<br>// A =&gt; E =&gt; B =&gt; D =&gt; C<br>这段代码中，从上往下执行的顺序被 Callback 打乱了。我们的阅读代码视线是A =&gt; B =&gt; C =&gt; D =&gt; E，但是执行顺序却是A =&gt; E =&gt; B =&gt; D =&gt; C，这就是非线性代码带来的糟糕之处。<br>通过将ajax后面执行的任务提前，可以更容易看懂代码的执行顺序。虽然代码因为嵌套看起来不美观，但现在的执行顺序却是从上到下的“线性”方式。这种技巧在写多重嵌套的代码时，是非常有用的。<br>A();<br>E();</p>
+<p>ajax(‘url1’, function(){<br>    B();<br>    D();</p>
+<pre><code>ajax(&apos;url2&apos;, function(){
+    C();
+}
+</code></pre><p>});<br>// A =&gt; E =&gt; B =&gt; D =&gt; C<br>上一段代码只有处理了成功回调，并没处理异常回调。接下来，把异常处理回调加上，再来讨论代码“线性”执行的问题。<br>A();</p>
+<p>ajax(‘url1’, function(){<br>    B();</p>
+<pre><code>ajax(&apos;url2&apos;, function(){
+    C();
+},function(){
+    D();
+});
+</code></pre><p>},function(){<br>    E();</p>
+<p>});<br>加上异常处理回调后，url1的成功回调函数 B 和异常回调函数 E，被分开了。这种“非线性”的情况又出现了。<br>在 node 中，为了解决的异常回调导致的“非线性”的问题，制定了错误优先的策略。node 中 callback 的第一个参数，专门用于判断是否发生异常<br>A();</p>
+<p>get(‘url1’, function(error){<br>    if(error){<br>        E();<br>    }else {<br>        B();</p>
+<pre><code>    get(&apos;url2&apos;, function(error){
+        if(error){
+            D();
+        }else{
+            C();
+        }
+    });
+}
+</code></pre><p>});<br>到此，callback 引起的“非线性”问题基本得到解决。遗憾的是，使用 callback 嵌套，一层层if else和回调函数，一旦嵌套层数多起来，阅读起来不是很方便。此外，callback 一旦出现异常，只能在当前回调函数内部处理异常。<br>promise</p>
+<p>在 JavaScript 的异步进化史中，涌现出一系列解决 callback 弊端的库，而 Promise 成为了最终的胜者，并成功地被引入了 ES6 中。它将提供了一个更好的“线性”书写方式，并解决了异步异常只能在当前回调中被捕获的问题。<br>Promise 就像一个中介，它承诺会将一个可信任的异步结果返回。首先 Promise 和异步接口签订一个协议，成功时，调用resolve函数通知 Promise，异常时，调用reject通知 Promise。另一方面 Promise 和 callback 也签订一个协议，由 Promise 在将来返回可信任的值给then和catch中注册的 callback。<br>// 创建一个 Promise 实例（异步接口和 Promise 签订协议）<br>var promise = new Promise(function (resolve,reject) {<br>  ajax(‘url’,resolve,reject);<br>});</p>
+<p>// 调用实例的 then catch 方法 （成功回调、异常回调与 Promise 签订协议）<br>promise.then(function(value) {<br>  // success<br>}).catch(function (error) {<br>  // error<br>})<br>Promise 是个非常不错的中介，它只返回可信的信息给 callback。它对第三方异步库的结果进行了一些加工，保证了 callback 一定会被异步调用，且只会被调用一次。<br>var promise1 = new Promise(function (resolve) {<br>  // 可能由于某些原因导致同步调用<br>  resolve(‘B’);<br>});<br>// promise依旧会异步执行<br>promise1.then(function(value){<br>    console.log(value)<br>});<br>console.log(‘A’);<br>// A B （先 A 后 B）</p>
+<p>var promise2 = new Promise(function (resolve) {<br>  // 成功回调被通知了2次<br>  setTimeout(function(){<br>    resolve();<br>  },0)<br>});<br>// promise只会调用一次<br>promise2.then(function(){<br>    console.log(‘A’)<br>});<br>// A (只有一个)</p>
+<p>var promise3 = new Promise(function (resolve,reject) {<br>  // 成功回调先被通知，又通知了失败回调<br>  setTimeout(function(){<br>    resolve();<br>    reject();<br>  },0)</p>
+<p>});<br>// promise只会调用成功回调<br>promise3.then(function(){<br>    console.log(‘A’)<br>}).catch(function(){<br>    console.log(‘B’)<br>});<br>// A（只有A）<br>介绍完 Promise 的特性后，来看看它如何利用链式调用，解决异步代码可读性的问题的。<br>var fetch = function(url){<br>    // 返回一个新的 Promise 实例<br>    return new Promise(function (resolve,reject) {<br>        ajax(url,resolve,reject);<br>    });<br>}</p>
+<p>A();<br>fetch(‘url1’).then(function(){<br>    B();<br>    // 返回一个新的 Promise 实例<br>    return fetch(‘url2’);<br>}).catch(function(){<br>    // 异常的时候也可以返回一个新的 Promise 实例<br>    return fetch(‘url2’);<br>    // 使用链式写法调用这个新的 Promise 实例的 then 方法<br>}).then(function() {<br>    C();<br>    // 继续返回一个新的 Promise 实例…<br>})<br>// A B C …<br>如此反复，不断返回一个 Promise 对象，再采用链式调用的方式不断地调用。使 Promise 摆脱了 callback 层层嵌套的问题和异步代码“非线性”执行的问题。<br>Promise 解决的另外一个难点是 callback 只能捕获当前错误异常。Promise 和 callback 不同，每个 callback 只能知道自己的报错情况，但 Promise 代理着所有的 callback，所有 callback 的报错，都可以由 Promise 统一处理。所以，可以通过catch来捕获之前未捕获的异常。<br>Promise 解决了 callback 的异步调用问题，但 Promise 并没有摆脱 callback，它只是将 callback 放到一个可以信任的中间机构，这个中间机构去链接我们的代码和异步接口。<br>异步（async）函数</p>
+<p>异步（async）函数是 ES7 的一个新的特性，它结合了 Promise，让我们摆脱 callback 的束缚，直接用类同步的“线性”方式，写异步函数。<br>声明异步函数，只需在普通函数前添加一个关键字 async 即可，如async function main(){} 。在异步函数中，可以使用await关键字，表示等待后面表达式的执行结果，一般后面的表达式是 Promise 实例。<br>async function main{<br>    // timer 是在上一个例子中定义的<br>    var value = await timer(100);<br>    console.log(value); // done （100ms 后返回 done）<br>}</p>
+<p>main();<br>异步函数和普通函数一样调用 main() 。调用后，会立即执行异步函数中的第一行代码 var value = await timer(100)。等到异步执行完成后，才会执行下一行代码。<br>除此之外，异步函数和其他函数基本类似，它使用try…catch来捕捉异常。也可以传入参数。但不要在异步函数中使用return来返回值。<br>var  timer = new Promise(function create(resolve,reject) {<br>  if(typeof delay !== ‘number’){<br>    reject(new Error(‘type error’));<br>  }<br>  setTimeout(resolve,delay,’done’);<br>});</p>
+<p>async function main(delay){<br>  try{<br>    var value1 = await timer(delay);<br>    var value2 = await timer(‘’);<br>    var value3 = await timer(delay);<br>  }catch(err){<br>    console.error(err);<br>      // Error: type error<br>      //   at create (<anonymous>:5:14)<br>      //   at timer (<anonymous>:3:10)<br>      //   at A (<anonymous>:12:10)<br>  }<br>}<br>main(0);<br>异步函数也可以被当作值，传入普通函数和异步函数中执行。但是在异步函数中，使用异步函数时要注意，如果不使用await，异步函数会被同步执行。<br>async function main(delay){<br>    var value1 = await timer(delay);<br>    console.log(‘A’)<br>}</anonymous></anonymous></anonymous></p>
+<p>async function doAsync(main){<br>  main(0);<br>  console.log(‘B’)<br>}</p>
+<p>doAsync(main);<br>// B A<br>这个时候打印出来的值是 B A。说明 doAsync 函数并没有等待 main 的异步执行完毕就执行了 console。如果要让 console 在 main 的异步执行完毕后才执行，我们需要在main前添加关键字await。<br>async function main(delay){<br>    var value1 = await timer(delay);<br>    console.log(‘A’)<br>}</p>
+<p>async function doAsync(main){<br>    await main(0);<br>    console.log(‘B’)<br>}</p>
+<p>doAsync(main);<br>// A B<br>由于异步函数采用类同步的书写方法，所以在处理多个并发请求，新手可能会像下面一样书写。这样会导致url2的请求必需等到url1的请求回来后才会发送。<br>var fetch = function (url) {<br>  return new Promise(function (resolve,reject) {<br>    ajax(url,resolve,reject);<br>  });<br>}</p>
+<p>async function main(){<br>  try{<br>    var value1 = await fetch(‘url1’);<br>    var value2 = await fetch(‘url2’);<br>    conosle.log(value1,value2);<br>  }catch(err){<br>    console.error(err)<br>  }<br>}</p>
+<p>main();<br>使用Promise.all的方法来解决这个问题。Promise.all用于将多个Promise实例，包装成一个新的 Promis e实例，当所有的 Promise 成功后才会触发Promise.all的resolve函数，当有一个失败，则立即调用Promise.all的reject函数。<br>var fetch = function (url) {<br>  return new Promise(function (resolve,reject) {<br>    ajax(url,resolve,reject);<br>  });<br>}</p>
+<p>async function main(){<br>  try{<br>    var arrValue = await Promise.all[fetch(‘url1’),fetch(‘url2’)];<br>    conosle.log(arrValue[0],arrValue[1]);<br>  }catch(err){<br>    console.error(err)<br>  }<br>}</p>
+<p>main();<br>目前使用 Babel 已经支持 ES7 异步函数的转码了，大家可以在自己的项目中开始尝试。<br>via：<a href="https://segmentfault.com/a/1190000006138882" target="_blank" rel="external">https://segmentfault.com/a/1190000006138882</a></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+
+
+
+<div class="article-share" id="share">
+
+  <div data-url="http://sryria.com/2016/09/06/JavaScript异步/" data-title="JavaScript异步 | sry blog" data-tsina="null" class="share clearfix">
+  </div>
+
+</div>
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2016/09/19/推荐系统学习-1/" title="推荐系统学习-1">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  推荐系统学习-1</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2016/09/05/JavaScript闭包/"  title="JavaScript闭包">
+ <strong>NEXT:</strong><br/> 
+ <span>JavaScript闭包
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+  
+
+  
+<div class="tagslist">
+	<p class="asidetitle">标签</p>
+		<ul class="clearfix">
+		
+			<li><a href="/tags/HTML5/" title="HTML5">HTML5<sup>2</sup></a></li>
+		
+			<li><a href="/tags/JavaScript/" title="JavaScript">JavaScript<sup>1</sup></a></li>
+		
+			<li><a href="/tags/bandit-CF/" title="bandit&amp;CF">bandit&amp;CF<sup>3</sup></a></li>
+		
+			<li><a href="/tags/协同过滤算法学习/" title="协同过滤算法学习">协同过滤算法学习<sup>2</sup></a></li>
+		
+			<li><a href="/tags/网络/" title="网络">网络<sup>1</sup></a></li>
+		
+		</ul>
+</div>
+
+
+  <div class="rsspart">
+	<a href="null" target="_blank" title="rss">RSS 订阅</a>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<div class="social-font clearfix">
+		
+		<a href="http://weibo.com/2495479173" target="_blank" title="weibo"></a>
+		
+		
+		
+		<a href="https://github.com/sryfae" target="_blank" title="github"></a>
+		
+		
+		
+	</div>
+		<p class="copyright">Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/A-limon/pacman" target="_blank" title="Pacman">Pacman</a> © 2016 
+		
+		<a href="http://sryria.com" target="_blank" title="sry">sry</a>
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+  </body>
+</html>
