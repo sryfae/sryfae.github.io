@@ -108,7 +108,7 @@ person.describe()
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> A = &#123;</span><br><span class="line">  name: <span class="string">'张三'</span>,</span><br><span class="line">  describe: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">'姓名：'</span>+ <span class="keyword">this</span>.name;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> B = &#123;</span><br><span class="line">  name: <span class="string">'李四'</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">B.describe = A.describe;</span><br><span class="line">B.describe()</span><br><span class="line"><span class="comment">// "姓名：李四"</span></span><br></pre></td></tr></table></figure>
 <p>上面代码中，A.describe属性被赋给B，于是B.describe就表示describe方法所在的当前对象是B，所以this.name就指向B.name。</p>
 <p>再看一个网页编程的例子。</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;input type=<span class="string">"text"</span> name=<span class="string">"age"</span> size=<span class="number">3</span> onChange=<span class="string">"validate(this, 18, 99);"</span>&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">function validate(obj, lowval, hival)&#123;</span><br><span class="line">  if ((obj.value &lt; lowval) || (obj.value &gt; hival))</span><br><span class="line">    console.log('Invalid Value!');</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;input type=<span class="string">"text"</span> name=<span class="string">"age"</span> size=<span class="number">3</span> onChange=<span class="string">"validate(this, 18, 99);"</span>&gt;</span><br><span class="line"></span><br><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">validate</span>(<span class="params">obj, lowval, hival</span>)</span>&#123;</span><br><span class="line">  <span class="keyword">if</span> ((obj.value &lt; lowval) || (obj.value &gt; hival))</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'Invalid Value!'</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br></pre></td></tr></table></figure>
 <p>上面代码是一个文本输入框，每当用户输入一个值，就会调用onChange回调函数，验证这个值是否在指定范围。回调函数传入this，就代表传入当前对象（即文本框），然后就可以从this.value上面读到用户的输入值。</p>
 <p>总结一下，JavaScript语言之中，一切皆对象，运行环境也是对象，所以函数都是在某个对象之中运行，this就是这个对象（环境）。这本来并不会让用户糊涂，但是JavaScript支持运行环境动态切换，也就是说，this的指向是动态的，没有办法事先确定到底指向哪个对象，这才是最让初学者感到困惑的地方。</p>
 <p>如果一个函数在全局环境中运行，那么this就是指顶层对象（浏览器中为window对象）。</p>
@@ -240,6 +240,14 @@ person.describe()
 	
 <nav class="article-nav clearfix">
  
+ <div class="prev" >
+ <a href="/2017/03/17/prototype对象/" title="prototype对象">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  prototype对象</span>
+</a>
+</div>
+
 
 <div class="next">
 <a href="/2017/03/16/面向对象编程/"  title="构造函数与 new 命令">
@@ -252,6 +260,11 @@ person.describe()
 </nav>
 
 	
+<section class="youyan" id="comments" style="margin: 3em 3em 0 3em">
+  <div id="uyan_frame"></div>
+  <script src="http://v2.uyan.cc/code/uyan.js?uid=2128409"></script>
+</section>
+
 </div>  
       <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
 
@@ -283,7 +296,7 @@ person.describe()
 		
 			<li><a href="/tags/网络/" title="网络">网络<sup>1</sup></a></li>
 		
-			<li><a href="/tags/面向对象编程/" title="面向对象编程">面向对象编程<sup>2</sup></a></li>
+			<li><a href="/tags/面向对象编程/" title="面向对象编程">面向对象编程<sup>3</sup></a></li>
 		
 		</ul>
 </div>
@@ -430,7 +443,6 @@ $(document).ready(function(){
   });
 });     
 </script>
-
 
 
 

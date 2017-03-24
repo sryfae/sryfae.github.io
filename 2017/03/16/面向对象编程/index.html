@@ -75,7 +75,7 @@
     </p>
   <p class="article-time">
     <time datetime="2017-03-16T04:45:20.000Z" itemprop="datePublished">2017-03-16</time>
-    更新日期:<time datetime="2017-03-16T05:41:59.106Z" itemprop="dateModified">2017-03-16</time>
+    更新日期:<time datetime="2017-03-17T06:16:58.294Z" itemprop="dateModified">2017-03-17</time>
     
   </p>
 </header>
@@ -103,7 +103,7 @@
 <ul>
 <li>生成对象的时候，必需用new命令，调用Vehicle函数。</li>
 </ul>
-<h1 id="new-命令"><a href="#new-命令" class="headerlink" title="new 命令"></a>new 命令</h1><h2 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h2><p><strong><em>new命令的作用，就是执行构造函数，返回一个实例对象</em></strong></p>
+<h1 id="new-命令"><a href="#new-命令" class="headerlink" title="new 命令"></a>new 命令</h1><h2 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h2><p><strong><em><mark>new命令的作用，就是执行构造函数，返回一个实例对象</mark></em></strong></p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> Vehicle = <span class="function"><span class="keyword">function</span> (<span class="params"></span>)</span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.price = <span class="number">1000</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> v = <span class="keyword">new</span> Vehicle();</span><br><span class="line">v.price <span class="comment">// 1000</span></span><br></pre></td></tr></table></figure>
 <p>一个很自然的问题是，如果忘了使用new命令，直接调用构造函数会发生什么事？</p>
 <p>这种情况下，构造函数就变成了普通函数，并不会生成实例对象。而且由于后面会说到的原因，this这时代表全局对象，将造成一些意想不到的结果。</p>
@@ -169,6 +169,11 @@
 </nav>
 
 	
+<section class="youyan" id="comments" style="margin: 3em 3em 0 3em">
+  <div id="uyan_frame"></div>
+  <script src="http://v2.uyan.cc/code/uyan.js?uid=2128409"></script>
+</section>
+
 </div>  
       <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
 
@@ -200,7 +205,7 @@
 		
 			<li><a href="/tags/网络/" title="网络">网络<sup>1</sup></a></li>
 		
-			<li><a href="/tags/面向对象编程/" title="面向对象编程">面向对象编程<sup>2</sup></a></li>
+			<li><a href="/tags/面向对象编程/" title="面向对象编程">面向对象编程<sup>3</sup></a></li>
 		
 		</ul>
 </div>
@@ -347,7 +352,6 @@ $(document).ready(function(){
   });
 });     
 </script>
-
 
 
 
